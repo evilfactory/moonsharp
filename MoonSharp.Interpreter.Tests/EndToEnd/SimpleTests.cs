@@ -1537,24 +1537,75 @@ namespace MoonSharp.Interpreter.Tests.EndToEnd
 //		}
 
 		[Test]
-        	public void NumericConversionFailsIfOutOfBounds()
-        	{
-            		Script S = new Script();
+        public void NumericConversionFailsIfOutOfBounds()
+        {
+            Script S = new Script();
 
-            		S.Globals["my_function_takes_byte"] = (Action<byte>)(p => { });
+            S.Globals["my_function_takes_byte"] = (Action<byte>)(p => { });
 
-            		try
-            		{
-                		S.DoString("my_function_takes_byte(2010191) -- a huge number that is definitely not a byte");
+            Assert.Throws<ScriptRuntimeException>(
+	            () => S.DoString("my_function_takes_byte(2010191) -- a huge number that is definitely not a byte"));
+        }
 
-                		Assert.Fail(); // ScriptRuntimeException should have been thrown, if it doesn't Assert.Fail should execute
-            		}
-            		catch (ScriptRuntimeException e)
-            		{
-                		//Assert.Pass(e.DecoratedMessage);
-            		}
-        	}
+        private DynValue ExecuteToNumber(string code, int? @base = null)
+	        => Script.RunString($"return tonumber('{code}' {(@base != null ? ", " + @base : "")})");
 
+        [Theory]
+		[TestCase(0, "0x0")]
+		[TestCase(0, "00")]
+		[TestCase(0, "-0")]
+		[TestCase(1, "0x1")]
+		[TestCase(.1, ".1")]
+		[TestCase(1.0 / 16, "0x.1")]
+		[TestCase(0xf, "0x   f ")]
+		[TestCase(-25, "-25.0")]
+		[TestCase(-0xff, "-0Xf f")]
+		[TestCase(55, "00000055")]
+		[TestCase(55, "		000 000 55 ")]
+		[TestCase(-360, "-0o0000550")]
+		[TestCase(-17.53125, "-0b0001 0001.1000 1000")]
+		[TestCase(15, "+15")]
+		[TestCase(15.15e15, "+15.15e+1 5")]
+		[TestCase(1, "1", 2)]
+		[TestCase(1, "1", 36)]
+		[TestCase(35, "Z", 36)]
+		[TestCase(10e10, "10e10", 10)]
+		[TestCase(12589254117.94167210424, "1e10.1", 10)]
+		public void ToNumber(double result, string code, int? @base = null)
+        {
+	        Assert.AreEqual(result, ExecuteToNumber(code, @base).Number, 0.00001f);
+		}
+
+		[Theory]
+		[TestCase("-0:D1")]
+		[TestCase("-")]
+		[TestCase("-0x")]
+		[TestCase("0b")]
+		[TestCase("123e")]
+		[TestCase("1Z3")]
+		[TestCase("123e123e123")]
+		[TestCase("2", 2)]
+		[TestCase("1010011e1", 2)]
+		[TestCase("1010011e1", 11)]
+		[TestCase("1010011e1e10", 10)]
+		public void ToNumberInvalid(string code, int? @base = null)
+		{
+			Assert.AreEqual(DynValue.Nil, ExecuteToNumber(code, @base));
+		}
+
+		[Theory]
+		[TestCase("11", 66)]
+		[TestCase("0", 1)]
+		public void ToNumberInvalidBase(string code, int @base)
+		{
+			Assert.Throws<ScriptRuntimeException>(() => ExecuteToNumber(code, @base));
+		}
+
+		[Test]
+		public void ToNumberNumberInpit()
+		{
+			Assert.AreEqual(42, Script.RunString("return tonumber(42)").Number);
+		}
 
 	}
 }
