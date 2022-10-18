@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
 using MoonSharp.Interpreter.Debugging;
 
@@ -219,9 +218,9 @@ namespace MoonSharp.Interpreter.CoreLib
 			if (args.Count < 1) throw ScriptRuntimeException.BadArgumentValueExpected(0, "tonumber");
 
 			DynValue e = args[0];
-			DynValue b = args.AsType(1, "tonumber", DataType.Number, true);
+			DynValue @base = args.AsType(1, "tonumber", DataType.Number, true);
 
-			if (b.IsNil())
+			if (@base.IsNil())
 			{
 				if (e.Type == DataType.Number)
 					return e;
@@ -229,51 +228,167 @@ namespace MoonSharp.Interpreter.CoreLib
 				if (e.Type != DataType.String)
 					return DynValue.Nil;
 
-				double d;
-				if (double.TryParse(e.String, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
-				{
-					return DynValue.NewNumber(d);
-				}
-				return DynValue.Nil;
+				return TryParse(e.String) is { } d ? DynValue.NewNumber(d) : DynValue.Nil;
 			}
 			else
 			{
-                //!COMPAT: tonumber supports only 2,8,10 or 16 as base
-                //UPDATE: added support for 3-9 base numbers
-                DynValue ee;
+				DynValue ee = args.AsType(0, "tonumber", DataType.String);
 
-				if (args[0].Type != DataType.Number)
-					ee = args.AsType(0, "tonumber", DataType.String, false);
-				else
-					ee = DynValue.NewString(args[0].Number.ToString(CultureInfo.InvariantCulture)); ;
+				int baseNum = (int)@base.Number;
 
-				int bb = (int)b.Number;
+				if (baseNum is < 2 or > 36)
+					throw new ScriptRuntimeException("bad argument #2 to 'tonumber' (base out of range)");
 
-			    uint uiv = 0;
-                if (bb == 2 || bb == 8 || bb == 10 || bb == 16)
-			    {
-                    uiv = Convert.ToUInt32(ee.String.Trim(), bb);
-                }
-			    else if (bb < 10 && bb > 2) // Support for 3, 4, 5, 6, 7 and 9 based numbers
-			    {
-			        foreach (char digit in ee.String.Trim())
-			        {
-			            int value = digit - 48;
-			            if (value < 0 || value >= bb)
-			            {
-                            throw new ScriptRuntimeException("bad argument #1 to 'tonumber' (invalid character)");
-                        }
-
-                        uiv = (uint)(uiv * bb) + (uint)value;
-			        }
-                }
-			    else
-			    {
-                    throw new ScriptRuntimeException("bad argument #2 to 'tonumber' (base out of range)");
-                }
-
-				return DynValue.NewNumber(uiv);
+				return TryParse(ee.String, baseNum) is { } d ? DynValue.NewNumber(d) : DynValue.Nil;
 			}
+
+			static double? TryParse(string str, int? fixedBase = null)
+			{
+				if (str.Length == 0)
+					return null;
+
+				int pos = 0;
+				bool negative = ParseSign();
+
+				if (pos == str.Length)
+					return null;
+
+				double? num = null;
+				if (fixedBase == null && str[pos] == '0' && IsNextPosValid())
+				{
+					pos++;
+					num =
+						TryParseInternalPrefixed('x', 16, c => c switch
+						{
+							>= '0' and <= '9' => c - '0',
+							>= 'a' and <= 'f' => c - 'a' + 10,
+							>= 'A' and <= 'F' => c - 'A' + 10,
+							_ => -1,
+						}) ??
+						TryParseInternalPrefixed('b', 2, c => c switch
+						{
+							'0' => 0,
+							'1' => 1,
+							_ => -1,
+						}) ??
+						TryParseInternalPrefixed('o', 8, c => c switch
+						{
+							>= '0' and < '8' => c - '0',
+							_ => -1,
+						});
+				}
+
+				num ??= fixedBase == null
+					? TryParseInternal(10, c => c switch
+					{
+						>= '0' and <= '9' => c - '0',
+						_ => -1,
+					}, true)
+					: TryParseInternal(fixedBase.Value, c => c switch
+					{
+						>= '0' and <= '9' => c - '0',
+						>= 'a' and <= 'z' => c - 'a' + 10,
+						>= 'A' and <= 'Z' => c - 'A' + 10,
+						_ => -1,
+					}, fixedBase == 10);
+
+				return negative ? -num : num;
+
+				bool IsPosValid() => pos < str.Length;
+				bool IsNextPosValid() => pos < str.Length - 1;
+
+				double? TryParseInternal(int toBase, Func<char, int> mapper, bool parseExp = false)
+				{
+					double value = 0.0;
+					
+					// Skip leading zeros
+					while (IsPosValid() && str[pos] == '0')
+						pos++;
+
+					while (IsPosValid()) {
+						if (char.IsWhiteSpace(str[pos])) { /* Skip */ }
+						else if (mapper(str[pos]) is var v && v != -1 && v < toBase)
+						{
+							value *= toBase;
+							value += v;
+						}
+						else if (str[pos] == '.' || parseExp && char.ToLower(str[pos]) == 'e')
+							break;
+						else
+							return null;
+						
+						pos++;
+					}
+
+					if (IsPosValid() && str[pos] == '.') {
+						pos++;
+						double divider = 1.0;
+						while (IsPosValid()) {
+							if (char.IsWhiteSpace(str[pos])) { /* Skip */ }
+							else if (mapper(str[pos]) is var v && v != -1 && v < toBase)
+							{
+								divider /= toBase;
+								value += divider * v;
+							}
+							else if (parseExp && char.ToLower(str[pos]) == 'e')
+								break;
+							else
+								return null;
+
+							pos++;
+						}
+					}
+
+					if (parseExp && IsPosValid() && char.ToLower(str[pos]) == 'e')
+					{
+						pos++;
+						if (!IsPosValid())
+							return null;
+
+						bool negative = ParseSign();
+
+						if (!IsPosValid())
+							return null;
+
+						double? exp = TryParseInternal(10, c => c switch
+						{
+							>= '0' and <= '9' => c - '0',
+							_ => -1,
+						});
+
+						if (exp == null)
+							return null;
+
+						value *= Math.Pow(10, negative ? -exp.Value : exp.Value);
+					}
+
+					return value;
+				}
+
+				double? TryParseInternalPrefixed(char identifier, int toBase, Func<char, int> mapper) {
+					if (char.ToLower(str[pos]) == identifier && IsNextPosValid())
+					{
+						pos++;
+						return TryParseInternal(toBase, mapper);
+					}
+
+					return null;
+				}
+
+				bool ParseSign()
+				{
+					if (str[pos] == '-')
+					{
+						pos++;
+						return true;
+					}
+					
+					if (str[pos] == '+')
+						pos++;
+
+					return false;
+				}
+			}	
 		}
 
 		[MoonSharpModuleMethod]
