@@ -1,5 +1,4 @@
-﻿using System;
-using MoonSharp.Interpreter.Debugging;
+﻿using MoonSharp.Interpreter.Debugging;
 using MoonSharp.Interpreter.Tree;
 
 namespace MoonSharp.Interpreter

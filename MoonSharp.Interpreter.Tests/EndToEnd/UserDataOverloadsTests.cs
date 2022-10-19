@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using MoonSharp.Interpreter.Compatibility;
-using MoonSharp.Interpreter.Interop;
-using MoonSharp.Interpreter.Loaders;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace MoonSharp.Interpreter.Tests.EndToEnd

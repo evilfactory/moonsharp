@@ -1,6 +1,4 @@
-﻿using System;
-using MoonSharp.Interpreter.Execution;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace MoonSharp.Interpreter.Tests.EndToEnd
 {

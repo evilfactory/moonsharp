@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using MoonSharp.Interpreter.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using MoonSharp.Interpreter.Execution;
 using NUnit.Framework;
 
 namespace MoonSharp.Interpreter.Tests.EndToEnd

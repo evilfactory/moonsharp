@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using MoonSharp.Interpreter.Compatibility;
 using MoonSharp.Interpreter.Interop.BasicDescriptors;
 using MoonSharp.Interpreter.Interop.RegistrationPolicies;

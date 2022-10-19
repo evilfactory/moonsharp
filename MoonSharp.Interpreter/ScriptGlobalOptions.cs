@@ -1,6 +1,5 @@
 ﻿using MoonSharp.Interpreter.Interop;
 using MoonSharp.Interpreter.Platforms;
-using MoonSharp.Interpreter;
 
 namespace MoonSharp.Interpreter
 {

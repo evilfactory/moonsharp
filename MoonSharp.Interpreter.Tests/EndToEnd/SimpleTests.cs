@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
-using MoonSharp.Interpreter.Execution;
 using NUnit.Framework;
-using MoonSharp.Interpreter.Loaders;
 
 namespace MoonSharp.Interpreter.Tests.EndToEnd
 {

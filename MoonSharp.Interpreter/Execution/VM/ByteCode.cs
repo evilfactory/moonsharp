@@ -3,8 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Text;
 using MoonSharp.Interpreter.Debugging;
 
 namespace MoonSharp.Interpreter.Execution.VM
