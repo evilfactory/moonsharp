@@ -1537,24 +1537,29 @@ namespace MoonSharp.Interpreter.Tests.EndToEnd
 //		}
 
 		[Test]
-        	public void NumericConversionFailsIfOutOfBounds()
-        	{
-            		Script S = new Script();
+        public void NumericConversionFailsIfOutOfBounds()
+        {
+            	Script S = new Script();
 
-            		S.Globals["my_function_takes_byte"] = (Action<byte>)(p => { });
+            	S.Globals["my_function_takes_byte"] = (Action<byte>)(p => { });
 
-            		try
-            		{
-                		S.DoString("my_function_takes_byte(2010191) -- a huge number that is definitely not a byte");
+            	try
+            	{
+                	S.DoString("my_function_takes_byte(2010191) -- a huge number that is definitely not a byte");
 
-                		Assert.Fail(); // ScriptRuntimeException should have been thrown, if it doesn't Assert.Fail should execute
-            		}
-            		catch (ScriptRuntimeException e)
-            		{
-                		//Assert.Pass(e.DecoratedMessage);
-            		}
-        	}
+                	Assert.Fail(); // ScriptRuntimeException should have been thrown, if it doesn't Assert.Fail should execute
+            	}
+            	catch (ScriptRuntimeException e)
+            	{
+                	//Assert.Pass(e.DecoratedMessage);
+            	}
+        }
 
-
+        [Test]
+        public void StackOverflow()
+        {
+			Assert.Throws<Interpreter.StackOverflowException>(() => Script.RunString("function f() f() end f()"));
+		}
 	}
+
 }

@@ -27,13 +27,10 @@ namespace MoonSharp.Interpreter.DataStructs
 
 		public T Push(T item)
 		{
+			if (m_HeadIdx >= m_Storage.Length)
+				throw new StackOverflowException();
 			m_Storage[m_HeadIdx++] = item;
 			return item;
-		}
-
-		public void Expand(int size)
-		{
-			m_HeadIdx += size;
 		}
 
 		private void Zero(int from, int to)
@@ -73,7 +70,7 @@ namespace MoonSharp.Interpreter.DataStructs
 			{
 				int oldhead = m_HeadIdx;
 				m_HeadIdx -= cnt;
-				Zero(m_HeadIdx, oldhead);
+				Zero(m_HeadIdx, oldhead - 1);
 			}
 		}
 
