@@ -11,12 +11,12 @@ namespace MoonSharp.Interpreter.Tests.Units
 		public void StackOverflow()
 		{
 			var stack = new FastStack<int>(0);
-			Assert.Throws<StackOverflowException>(() => stack.Push(0));
+			Assert.Throws<ScriptStackOverflowException>(() => stack.Push(0));
 
 			var strStack = new FastStack<string>(12);
 			foreach (var _ in Enumerable.Range(0, 12))
 				strStack.Push("");
-			Assert.Throws<StackOverflowException>(() => strStack.Push(""));
+			Assert.Throws<ScriptStackOverflowException>(() => strStack.Push(""));
 		}
 
 		[Test]

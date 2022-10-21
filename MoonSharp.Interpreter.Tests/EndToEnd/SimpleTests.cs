@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
-using MoonSharp.Interpreter.Execution;
 using NUnit.Framework;
-using MoonSharp.Interpreter.Loaders;
 
 namespace MoonSharp.Interpreter.Tests.EndToEnd
 {
@@ -1554,12 +1551,6 @@ namespace MoonSharp.Interpreter.Tests.EndToEnd
                 	//Assert.Pass(e.DecoratedMessage);
             	}
         }
-
-        [Test]
-        public void StackOverflow()
-        {
-			Assert.Throws<Interpreter.StackOverflowException>(() => Script.RunString("function f() f() end f()"));
-		}
 	}
 
 }

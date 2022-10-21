@@ -28,7 +28,7 @@ namespace MoonSharp.Interpreter.DataStructs
 		public T Push(T item)
 		{
 			if (m_HeadIdx >= m_Storage.Length)
-				throw new StackOverflowException();
+				throw new ScriptStackOverflowException();
 			m_Storage[m_HeadIdx++] = item;
 			return item;
 		}
