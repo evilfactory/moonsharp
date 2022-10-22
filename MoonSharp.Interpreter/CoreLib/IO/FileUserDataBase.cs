@@ -217,7 +217,7 @@ namespace MoonSharp.Interpreter.CoreLib.IO
 		public override string ToString()
 		{
 			if (isopen())
-				return string.Format("file ({0:X8})", base.ReferenceID);
+				return $"file ({base.ReferenceID:X8})";
 			else
 				return "file (closed)";
 		}

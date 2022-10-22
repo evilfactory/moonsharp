@@ -41,7 +41,7 @@ namespace MoonSharp.Interpreter.Debugging
 			Name = name;
 			Code = code;
 
-			lines.Add(string.Format("-- Begin of chunk : {0} ", name));
+			lines.Add($"-- Begin of chunk : {name} ");
 
 			lines.AddRange(Code.Split('\n'));
 

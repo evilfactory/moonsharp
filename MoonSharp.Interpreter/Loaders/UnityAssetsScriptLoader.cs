@@ -103,7 +103,7 @@ namespace MoonSharp.Interpreter.Loaders
 #if !(PCL || ENABLE_DOTNET || NETFX_CORE)
 				Console.WriteLine("Error initializing UnityScriptLoader : {0}", ex);
 #endif
-				System.Diagnostics.Debug.WriteLine(string.Format("Error initializing UnityScriptLoader : {0}", ex));
+				System.Diagnostics.Debug.WriteLine($"Error initializing UnityScriptLoader : {ex}");
 			}
 		}
 #endif
@@ -138,10 +138,10 @@ namespace MoonSharp.Interpreter.Loaders
 				return m_Resources[file];
 			else
 			{
-				var error = string.Format(
-@"Cannot load script '{0}'. By default, scripts should be .txt files placed under a Assets/Resources/{1} directory.
+				var error =
+					$@"Cannot load script '{file}'. By default, scripts should be .txt files placed under a Assets/Resources/{DEFAULT_PATH} directory.
 If you want scripts to be put in another directory or another way, use a custom instance of UnityAssetsScriptLoader or implement
-your own IScriptLoader (possibly extending ScriptLoaderBase).", file, DEFAULT_PATH);
+your own IScriptLoader (possibly extending ScriptLoaderBase).";
 
 				throw new Exception(error);
 			}

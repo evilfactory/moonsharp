@@ -2,6 +2,7 @@
 #pragma warning disable 1591
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using MoonSharp.Interpreter.CoreLib.StringLib;
@@ -181,14 +182,14 @@ namespace MoonSharp.Interpreter.CoreLib
         public static DynValue lower(ScriptExecutionContext executionContext, CallbackArguments args)
         {
             DynValue arg_s = args.AsType(0, "lower", DataType.String, false);
-            return DynValue.NewString(arg_s.String.ToLower());
+            return DynValue.NewString(arg_s.String.ToLower(CultureInfo.InvariantCulture));
         }
 
         [MoonSharpModuleMethod]
         public static DynValue upper(ScriptExecutionContext executionContext, CallbackArguments args)
         {
             DynValue arg_s = args.AsType(0, "upper", DataType.String, false);
-            return DynValue.NewString(arg_s.String.ToUpper());
+            return DynValue.NewString(arg_s.String.ToUpper(CultureInfo.InvariantCulture));
         }
 
         [MoonSharpModuleMethod]

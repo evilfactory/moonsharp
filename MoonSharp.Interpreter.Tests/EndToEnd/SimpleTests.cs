@@ -198,9 +198,9 @@ namespace MoonSharp.Interpreter.Tests.EndToEnd
 		{
 			string keywrd = "and break do else elseif end false end for function end goto if ::in:: in local nil not [or][[][==][[]] repeat return { then 0 end return; }; then true (x != 5 or == * 3 - 5) x";
 
-			string script = string.Format(@"    
-				x = '{0}';
-				return x;", keywrd);
+			string script = $@"    
+				x = '{keywrd}';
+				return x;";
 
 			DynValue res = Script.RunString(script);
 			Assert.AreEqual(DataType.String, res.Type);
@@ -1551,6 +1551,51 @@ namespace MoonSharp.Interpreter.Tests.EndToEnd
                 	//Assert.Pass(e.DecoratedMessage);
             	}
         }
+		
+		[Test]
+		public void StackIsCleanWithLocals()
+		{
+			Assert.AreEqual(DynValue.Nil, Script.RunString(@"
+				local function test()
+				   for k, v in pairs{1} do
+				       local my
+						return my
+				   end
+				end
+				return test()"
+			));
+			
+			Assert.AreEqual(DynValue.NewTuple(DynValue.Nil, DynValue.Nil), Script.RunString(@"
+				local function test()
+				   for k, v in pairs{1} do
+				       local my, de
+						return my, de
+				   end
+				end
+				return test()"
+			));
+
+			Assert.That(DynValue.NewTuple(DynValue.NewNumber(42), DynValue.Nil), Is.EqualTo(Script.RunString(@"
+				local function test()
+				   for k, v in pairs{1} do
+				       local my, de = 42
+						return my, de
+				   end
+				end
+				return test()"
+			)));
+
+			Assert.AreEqual(DynValue.NewTuple(DynValue.NewNumber(42), DynValue.Nil), Script.RunString(@"
+				local function test()
+				   for k, v in pairs{1} do
+				       local my = 42, de
+						return my, de
+				   end
+				end
+				return test()"
+			));
+		}
+
 	}
 
 }

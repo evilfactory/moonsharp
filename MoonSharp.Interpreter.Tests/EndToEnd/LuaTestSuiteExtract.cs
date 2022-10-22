@@ -36,7 +36,7 @@ namespace MoonSharp.Interpreter.Tests.EndToEnd
 					++i;
 
 					if (!a[0].CastToBool())
-						failedTests.Add(string.Format("assert #{0}", i));
+						failedTests.Add($"assert #{i}");
 
 					return DynValue.Nil;
 				})));
@@ -50,8 +50,8 @@ namespace MoonSharp.Interpreter.Tests.EndToEnd
 
 			DynValue res = S.DoString(script);
 
-			Assert.IsFalse(failedTests.Any(), string.Format("Failed asserts {0}",
-				string.Join(", ", failedTests.Select(xi => xi.ToString()).ToArray())));
+			Assert.IsFalse(failedTests.Any(),
+				$"Failed asserts {string.Join(", ", failedTests.Select(xi => xi.ToString()).ToArray())}");
 		}
 
 		[Test]

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MoonSharp.Interpreter;
+﻿using System.Globalization;
+using System.Threading;
 using MoonSharp.Interpreter.Serialization.Json;
 using NUnit.Framework;
 
@@ -143,6 +140,21 @@ namespace MoonSharp.Interpreter.Tests.EndToEnd
 			AssertTableValues(t);
 		}
 
+		[Test]
+		public void SerializeNoLocalize()
+		{
+			// German uses , as a decimal separator, we don't want that
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE");
+			Assert.AreEqual("{\"test\":0.01}", Script.RunString("return json.serialize({test = 0.01})").String);
+		}
+
+		[Test]
+		public void ParseNoLocalize()
+		{
+			// German uses , as a decimal separator, we don't want that
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE");
+			Assert.AreEqual(1.23, Script.RunString("return json.parse('{\"test\":1.23}').test").Number);
+		}
 
 	}
 }

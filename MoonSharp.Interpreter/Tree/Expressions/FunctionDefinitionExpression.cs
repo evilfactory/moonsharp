@@ -156,7 +156,7 @@ namespace MoonSharp.Interpreter.Tree.Expressions
 			for (int i = paramnames.Count - 1; i >= 0; i--)
 			{
 				if (!names.Add(paramnames[i]))
-					paramnames[i] = paramnames[i] + "@" + i.ToString();
+					paramnames[i] = paramnames[i] + "@" + i;
 
 				ret[i] = lcontext.Scope.DefineLocal(paramnames[i]);
 			}

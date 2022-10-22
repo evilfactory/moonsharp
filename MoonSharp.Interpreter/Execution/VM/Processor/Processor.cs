@@ -164,7 +164,8 @@ namespace MoonSharp.Interpreter.Execution.VM
 
 			if (m_OwningThreadID >= 0 && m_OwningThreadID != threadID && m_Script.Options.CheckThreadAccess)
 			{
-				string msg = string.Format("Cannot enter the same MoonSharp processor from two different threads : {0} and {1}", m_OwningThreadID, threadID);
+				string msg =
+					$"Cannot enter the same MoonSharp processor from two different threads : {m_OwningThreadID} and {threadID}";
 				throw new InvalidOperationException(msg);
 			}
 

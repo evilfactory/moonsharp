@@ -22,7 +22,7 @@ namespace MoonSharp.Interpreter.Tests.EndToEnd
 
 			public string ConcatNums(int p1, int p2)
 			{
-				return string.Format("{0}%{1}", p1, p2);
+				return $"{p1}%{p2}";
 			}
 
 			public int SomeMethodWithLongName(int i)
@@ -142,7 +142,7 @@ namespace MoonSharp.Interpreter.Tests.EndToEnd
 
 			public string ConcatNums(int p1, int p2)
 			{
-				return string.Format("{0}%{1}", p1, p2);
+				return $"{p1}%{p2}";
 			}
 
 			public int SomeMethodWithLongName(int i)

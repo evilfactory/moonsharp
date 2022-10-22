@@ -79,12 +79,7 @@ namespace MoonSharp.Interpreter.Debugging
 		/// A <see cref="System.String" /> that represents this instance.
 		/// </returns>
 		public override string ToString()
-		{
-			return string.Format("[{0}]{1} ({2}, {3}) -> ({4}, {5})",
-				SourceIdx, IsStepStop ? "*" : " ",
-				FromLine, FromChar,
-				ToLine, ToChar);
-		}
+			=> $"[{SourceIdx}]{(IsStepStop ? "*" : " ")} ({FromLine}, {FromChar}) -> ({ToLine}, {ToChar})";
 
 		internal int GetLocationDistance(int sourceIdx, int line, int col)
 		{
@@ -184,22 +179,22 @@ namespace MoonSharp.Interpreter.Debugging
 
 			if (script.Options.UseLuaErrorLocations || forceClassicFormat)
 			{
-				return string.Format("{0}:{1}", sc.Name, this.FromLine);
+				return $"{sc.Name}:{this.FromLine}";
 			}
 			else if (this.FromLine == this.ToLine)
 			{
 				if (this.FromChar == this.ToChar)
 				{
-					return string.Format("{0}:({1},{2})", sc.Name, this.FromLine, this.FromChar, this.ToLine, this.ToChar);
+					return $"{sc.Name}:({this.FromLine},{this.FromChar})";
 				}
 				else
 				{
-					return string.Format("{0}:({1},{2}-{4})", sc.Name, this.FromLine, this.FromChar, this.ToLine, this.ToChar);
+					return $"{sc.Name}:({this.FromLine},{this.FromChar}-{this.ToChar})";
 				}
 			}
 			else
 			{
-				return string.Format("{0}:({1},{2}-{3},{4})", sc.Name, this.FromLine, this.FromChar, this.ToLine, this.ToChar);
+				return $"{sc.Name}:({this.FromLine},{this.FromChar}-{this.ToLine},{this.ToChar})";
 			}
 		}
 	}

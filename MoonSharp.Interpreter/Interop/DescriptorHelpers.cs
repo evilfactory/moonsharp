@@ -33,7 +33,8 @@ namespace MoonSharp.Interpreter.Interop
 			MoonSharpHiddenAttribute ha = mi.GetCustomAttributes(true).OfType<MoonSharpHiddenAttribute>().SingleOrDefault();
 
 			if (va != null && ha != null && va.Visible)
-				throw new InvalidOperationException(string.Format("A member ('{0}') can't have discording MoonSharpHiddenAttribute and MoonSharpVisibleAttribute.", mi.Name));
+				throw new InvalidOperationException(
+					$"A member ('{mi.Name}') can't have discording MoonSharpHiddenAttribute and MoonSharpVisibleAttribute.");
 			else if (ha != null)
 				return false;
 			else if (va != null)

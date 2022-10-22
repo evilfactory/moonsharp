@@ -8,6 +8,8 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <DefineConstants>$(DefineConstants);DOTNET_CORE;NETFX_CORE</DefineConstants>
     <AssemblyName>MoonSharp.Interpreter</AssemblyName>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <WarningsAsErrors>CA1304,CA1305</WarningsAsErrors>
   </PropertyGroup>
 
 </Project>

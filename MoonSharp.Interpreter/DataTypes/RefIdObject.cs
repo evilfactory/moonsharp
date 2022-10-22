@@ -28,7 +28,7 @@ namespace MoonSharp.Interpreter
 		/// <returns></returns>
 		public string FormatTypeString(string typeString)
 		{
-			return string.Format("{0}: {1:X8}", typeString, m_RefID);
+			return $"{typeString}: {m_RefID:X8}";
 		}
 
 	}

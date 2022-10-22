@@ -86,9 +86,9 @@ namespace MoonSharp.Interpreter
 				return "(default _ENV)";
 			else
 			if (i_Type == SymbolRefType.Global)
-				return string.Format("{2} : {0} / {1}", i_Type, i_Env, i_Name);
+				return $"{i_Name} : {i_Type} / {i_Env}";
 			else
-				return string.Format("{2} : {0}[{1}]", i_Type, i_Index, i_Name);
+				return $"{i_Name} : {i_Type}[{i_Index}]";
 		}
 
 		/// <summary>

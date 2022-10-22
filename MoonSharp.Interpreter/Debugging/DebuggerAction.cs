@@ -121,7 +121,7 @@ namespace MoonSharp.Interpreter.Debugging
 		{
 			if (Action == ActionType.ToggleBreakpoint || Action == ActionType.SetBreakpoint || Action == ActionType.ClearBreakpoint)
 			{
-				return string.Format("{0} {1}:({2},{3})", Action, SourceID, SourceLine, SourceCol);
+				return $"{Action} {SourceID}:({SourceLine},{SourceCol})";
 			}
 			else
 			{

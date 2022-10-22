@@ -68,7 +68,7 @@ namespace MoonSharp.Interpreter.Interop
 				parameters = new ParameterDescriptor[rank];
 
 				for (int i = 0; i < rank; i++)
-					parameters[i] = new ParameterDescriptor("idx" + i.ToString(), typeof(int));
+					parameters[i] = new ParameterDescriptor("idx" + i, typeof(int));
 			}
 			else
 			{

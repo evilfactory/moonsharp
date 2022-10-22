@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace MoonSharp.Interpreter.Interop.Converters
 {
@@ -70,22 +71,22 @@ namespace MoonSharp.Interpreter.Interop.Converters
 		/// </summary>
 		internal static double TypeToDouble(Type type, object d)
 		{
-            		if (type != typeof(double) &&
-                		type != typeof(sbyte) &&
-                		type != typeof(byte) &&
-                		type != typeof(short) &&
-                		type != typeof(ushort) &&
-                		type != typeof(int) &&
-                		type != typeof(uint) &&
-                		type != typeof(long) &&
-                		type != typeof(ulong) &&
-                		type != typeof(float) &&
-                		type != typeof(decimal))
-            		{
-                		return (double)d;
-            		}
+	        if (type != typeof(double) &&
+	            type != typeof(sbyte) &&
+	            type != typeof(byte) &&
+	            type != typeof(short) &&
+	            type != typeof(ushort) &&
+	            type != typeof(int) &&
+	            type != typeof(uint) &&
+	            type != typeof(long) &&
+	            type != typeof(ulong) &&
+	            type != typeof(float) &&
+	            type != typeof(decimal))
+	        {
+	            return (double)d;
+	        }
 
-			return Convert.ToDouble(d);
+	        return Convert.ToDouble(d, CultureInfo.InvariantCulture);
 		}
 
 

@@ -255,7 +255,7 @@ namespace MoonSharp.Interpreter.CoreLib
 		public static string IoExceptionToLuaMessage(Exception ex, string filename)
 		{
 			if (ex is System.IO.FileNotFoundException)
-				return string.Format("{0}: No such file or directory", filename);
+				return $"{filename}: No such file or directory";
 			else
 				return ex.Message;
 		}

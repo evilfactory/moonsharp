@@ -118,7 +118,7 @@ namespace MoonSharp.Interpreter
 				case DataType.TailCallRequest:
 				case DataType.YieldRequest:
 				default:
-					return string.Format("internal<{0}>", type.ToLuaDebuggerString());
+					return $"internal<{type.ToLuaDebuggerString()}>";
 			}
 		}
 

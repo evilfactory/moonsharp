@@ -34,14 +34,7 @@ namespace MoonSharp.Interpreter.Diagnostics
 		/// Returns a <see cref="System.String" /> that represents this instance.
 		/// </summary>
 		public override string ToString()
-		{
-			return string.Format("{0}{1} : {2} times / {3} {4}",
-				Name,
-				Global ? "(g)" : "",
-				Instances,
-				Counter,
-				PerformanceCounterTypeToString(Type));
-		}
+			=> $"{Name}{(Global ? "(g)" : "")} : {Instances} times / {Counter} {PerformanceCounterTypeToString(Type)}";
 
 		/// <summary>
 		/// Converts a PerformanceCounterType to a string.

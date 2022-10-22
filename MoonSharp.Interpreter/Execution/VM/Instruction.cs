@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using MoonSharp.Interpreter.Debugging;
@@ -32,12 +33,12 @@ namespace MoonSharp.Interpreter.Execution.VM
 				append += GenSpaces();
 
 			if ((this.OpCode == VM.OpCode.Meta) ||((usage & ((int)InstructionFieldUsage.NumValAsCodeAddress)) == (int)InstructionFieldUsage.NumValAsCodeAddress))
-				append += " " + NumVal.ToString("X8");
+				append += " " + NumVal.ToString("X8", CultureInfo.InvariantCulture);
 			else if ((usage & ((int)InstructionFieldUsage.NumVal)) != 0)
-				append += " " + NumVal.ToString();
+				append += " " + NumVal;
 
 			if ((usage & ((int)InstructionFieldUsage.NumVal2)) != 0)
-				append += " " + NumVal2.ToString();
+				append += " " + NumVal2;
 
 			if ((usage & ((int)InstructionFieldUsage.Name)) != 0)
 				append += " " + Name;
@@ -172,7 +173,7 @@ namespace MoonSharp.Interpreter.Execution.VM
 				case DataType.Table :
 					return DynValue.NewTable(envTable);
 				default:
-					throw new NotSupportedException(string.Format("Unsupported type in chunk dump : {0}", dt));
+					throw new NotSupportedException($"Unsupported type in chunk dump : {dt}");
 			}
 		}
 
@@ -204,7 +205,7 @@ namespace MoonSharp.Interpreter.Execution.VM
 					wr.Write(value.String);
 					break;
 				default:
-					throw new NotSupportedException(string.Format("Unsupported type in chunk dump : {0}", value.Type));
+					throw new NotSupportedException($"Unsupported type in chunk dump : {value.Type}");
 			}
 		}
 

@@ -28,11 +28,11 @@ namespace MoonSharp.Interpreter.Tree
 		{
 			string tokenTypeString = (Type.ToString() + "                                                      ").Substring(0, 16);
 
-			string location = string.Format("{0}:{1}-{2}:{3}", FromLine, FromCol, ToLine, ToCol);
+			string location = $"{FromLine}:{FromCol}-{ToLine}:{ToCol}";
 
 			location = (location + "                                                      ").Substring(0, 10);
 
-			return string.Format("{0}  - {1} - '{2}'", tokenTypeString, location, this.Text ?? "");
+			return $"{tokenTypeString}  - {location} - '{this.Text ?? ""}'";
 		}
 
 		public static TokenType? GetReservedTokenType(string reservedWord)

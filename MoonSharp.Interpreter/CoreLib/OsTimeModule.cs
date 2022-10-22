@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace MoonSharp.Interpreter.CoreLib
@@ -225,11 +226,11 @@ namespace MoonSharp.Interpreter.CoreLib
 
 				if (STANDARD_PATTERNS.ContainsKey(c))
 				{
-					sb.Append(d.ToString(STANDARD_PATTERNS[c]));
+					sb.Append(d.ToString(STANDARD_PATTERNS[c], CultureInfo.InvariantCulture));
 				}
 				else if (c == 'e')
 				{
-					string s = d.ToString("%d");
+					string s = d.ToString("%d", CultureInfo.InvariantCulture);
 					if (s.Length < 2) s = " " + s;
 					sb.Append(s);
 				}
@@ -247,7 +248,7 @@ namespace MoonSharp.Interpreter.CoreLib
 				}
 				else if (c == 'j')
 				{
-					sb.Append(d.DayOfYear.ToString("000"));
+					sb.Append(d.DayOfYear.ToString("000", CultureInfo.InvariantCulture));
 				}
 				else if (c == 'u')
 				{

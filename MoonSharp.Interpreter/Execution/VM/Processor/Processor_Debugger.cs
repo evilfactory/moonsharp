@@ -282,7 +282,7 @@ namespace MoonSharp.Interpreter.Execution.VM
 			return coroutinesStack.Select(c => new WatchItem()
 			{
 				Address = c.AssociatedCoroutine.ReferenceID,
-				Name = "coroutine #" + c.AssociatedCoroutine.ReferenceID.ToString()
+				Name = "coroutine #" + c.AssociatedCoroutine.ReferenceID
 			}).ToList();
 		}
 

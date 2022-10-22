@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace MoonSharp.Interpreter.Tests.EndToEnd
 {
@@ -291,6 +287,16 @@ namespace MoonSharp.Interpreter.Tests.EndToEnd
 			DynValue res = S.DoString("return string.match(s, p)");
 
 			Assert.AreEqual(expected, !res.IsNil());
+		}
+
+		[Test]
+		public void ComplexMatch()
+		{
+			Script.RunString(@"
+				local text = 'Client ‖metadata: STEAM_X:X:XXXXXXXXX‖example‖end‖ started the round.'
+				local r1, r2, r3 = text:match('.*(‖metadata:(.*).*‖(.*)‖end‖).*')
+				print(r1, r2, r3)
+			");
 		}
 
 	}

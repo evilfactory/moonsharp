@@ -267,7 +267,7 @@ namespace MoonSharp.Interpreter
 		{
 			return new DynValue()
 			{
-				m_Object = string.Format(format, args),
+				m_Object = string.Format(CultureInfo.InvariantCulture, format, args),
 				m_Type = DataType.String,
 			};
 		}
@@ -655,15 +655,15 @@ namespace MoonSharp.Interpreter
 				case DataType.Nil:
 					return "nil";
 				case DataType.Boolean:
-					return Boolean.ToString().ToLower();
+					return Boolean.ToString().ToLower(CultureInfo.InvariantCulture);
 				case DataType.Number:
 					return Number.ToString(CultureInfo.InvariantCulture);
 				case DataType.String:
 					return "\"" + String + "\"";
 				case DataType.Function:
-					return string.Format("(Function {0:X8})", Function.EntryPointByteCodeLocation);
+					return $"(Function {Function.EntryPointByteCodeLocation:X8})";
 				case DataType.ClrFunction:
-					return string.Format("(Function CLR)", Function);
+					return "(Function CLR)";
 				case DataType.Table:
 					return "(Table)";
 				case DataType.Tuple:
@@ -673,7 +673,7 @@ namespace MoonSharp.Interpreter
 				case DataType.UserData:
 					return "(UserData)";
 				case DataType.Thread:
-					return string.Format("(Coroutine {0:X8})", this.Coroutine.ReferenceID);
+					return $"(Coroutine {this.Coroutine.ReferenceID:X8})";
 				default:
 					return "(???)";
 			}
@@ -769,7 +769,7 @@ namespace MoonSharp.Interpreter
 					return Table == other.Table;
 				case DataType.Tuple:
 				case DataType.TailCallRequest:
-					return Tuple == other.Tuple;
+					return Tuple.SequenceEqual(other.Tuple);
 				case DataType.Thread:
 					return Coroutine == other.Coroutine;
 				case DataType.UserData:
@@ -806,7 +806,7 @@ namespace MoonSharp.Interpreter
 			DynValue rv = ToScalar();
 			if (rv.Type == DataType.Number)
 			{
-				return rv.Number.ToString();
+				return rv.Number.ToString(CultureInfo.InvariantCulture);
 			}
 			else if (rv.Type == DataType.String)
 			{

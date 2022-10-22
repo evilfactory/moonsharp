@@ -32,7 +32,7 @@ namespace MoonSharp.Interpreter.Tree.Statements
 			{
 				Token name = CheckTokenType(lcontext, TokenType.Name);
 				m_FuncSymbol = lcontext.Scope.TryDefineLocal(name.Text);
-				m_FriendlyName = string.Format("{0} (local)", name.Text);
+				m_FriendlyName = $"{name.Text} (local)";
 				m_SourceRef = funcKeyword.GetSourceRef(name);
 			}
 			else

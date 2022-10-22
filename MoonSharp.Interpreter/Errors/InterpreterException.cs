@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using MoonSharp.Interpreter.Debugging;
 
 namespace MoonSharp.Interpreter
@@ -48,7 +49,7 @@ namespace MoonSharp.Interpreter
 		/// <param name="format">The format.</param>
 		/// <param name="args">The arguments.</param>
 		protected InterpreterException(string format, params object[] args)
-			: base(string.Format(format, args))
+			: base(string.Format(CultureInfo.InvariantCulture, format, args))
 		{
 
 		}
@@ -86,11 +87,11 @@ namespace MoonSharp.Interpreter
 				}
 				else if (sref != null)
 				{
-					this.DecoratedMessage = string.Format("{0}: {1}", sref.FormatLocation(script), this.Message);
+					this.DecoratedMessage = $"{sref.FormatLocation(script)}: {this.Message}";
 				}
 				else
 				{
-					this.DecoratedMessage = string.Format("bytecode:{0}: {1}", ip, this.Message);
+					this.DecoratedMessage = $"bytecode:{ip}: {this.Message}";
 				}
 			}
 		}

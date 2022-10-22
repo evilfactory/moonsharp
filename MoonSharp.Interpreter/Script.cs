@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -121,7 +122,7 @@ namespace MoonSharp.Interpreter
 		{
 			this.CheckScriptOwnership(globalTable);
 
-			string chunkName = string.Format("libfunc_{0}", funcFriendlyName ?? m_Sources.Count.ToString());
+			string chunkName = $"libfunc_{funcFriendlyName ?? m_Sources.Count.ToString(CultureInfo.InvariantCulture)}";
 
 			SourceCode source = new SourceCode(chunkName, code, m_Sources.Count, this);
 
@@ -173,7 +174,7 @@ namespace MoonSharp.Interpreter
 					return LoadStream(ms, globalTable, codeFriendlyName);
 			}
 
-			string chunkName = string.Format("{0}", codeFriendlyName ?? "chunk_" + m_Sources.Count.ToString());
+			string chunkName = $"{codeFriendlyName ?? "chunk_" + m_Sources.Count}";
 
 			SourceCode source = new SourceCode(codeFriendlyName ?? chunkName, code, m_Sources.Count, this);
 
@@ -214,10 +215,10 @@ namespace MoonSharp.Interpreter
 			}
 			else
 			{
-				string chunkName = string.Format("{0}", codeFriendlyName ?? "dump_" + m_Sources.Count.ToString());
+				string chunkName = $"{codeFriendlyName ?? "dump_" + m_Sources.Count}";
 
 				SourceCode source = new SourceCode(codeFriendlyName ?? chunkName,
-					string.Format("-- This script was decoded from a binary dump - dump_{0}", m_Sources.Count),
+					$"-- This script was decoded from a binary dump - dump_{m_Sources.Count}",
 					m_Sources.Count, this);
 
 				m_Sources.Add(source);
@@ -311,7 +312,8 @@ namespace MoonSharp.Interpreter
 				if (code == null)
 					throw new InvalidCastException("Unexpected null from IScriptLoader.LoadFile");
 				else
-					throw new InvalidCastException(string.Format("Unsupported return type from IScriptLoader.LoadFile : {0}", code.GetType()));
+					throw new InvalidCastException(
+						$"Unsupported return type from IScriptLoader.LoadFile : {code.GetType()}");
 			}
 		}
 
@@ -758,7 +760,9 @@ namespace MoonSharp.Interpreter
 			subproduct = (subproduct != null) ? (subproduct + " ") : "";
 
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine(string.Format("MoonSharp {0}{1} [{2}]", subproduct, Script.VERSION, Script.GlobalOptions.Platform.GetPlatformName()));
+#pragma warning disable CA1305 // Specify IFormatProvider
+			sb.AppendLine($"MoonSharp {subproduct}{VERSION} [{GlobalOptions.Platform.GetPlatformName()}]");
+#pragma warning restore CA1305 // Specify IFormatProvider
 			sb.AppendLine("Copyright (C) 2014-2016 Marco Mastropaolo");
 			sb.AppendLine("http://www.moonsharp.org");
 			return sb.ToString();

@@ -324,7 +324,7 @@ namespace MoonSharp.Interpreter.Interop.LuaStateInterop
 				if (m.Groups[1] != null && m.Groups[1].Value.Length > 0)
 				{
 					string val = m.Groups[1].Value.Substring(0, m.Groups[1].Value.Length - 1);
-					paramIx = Convert.ToInt32(val) - 1;
+					paramIx = Convert.ToInt32(val, CultureInfo.InvariantCulture) - 1;
 				};
 				#endregion
 
@@ -360,7 +360,7 @@ namespace MoonSharp.Interpreter.Interop.LuaStateInterop
 				fieldLength = int.MinValue;
 				if (m.Groups[3] != null && m.Groups[3].Value.Length > 0)
 				{
-					fieldLength = Convert.ToInt32(m.Groups[3].Value);
+					fieldLength = Convert.ToInt32(m.Groups[3].Value, CultureInfo.InvariantCulture);
 					flagZeroPadding = (m.Groups[3].Value[0] == '0');
 				}
 				#endregion
@@ -379,7 +379,7 @@ namespace MoonSharp.Interpreter.Interop.LuaStateInterop
 				// extract field precision
 				fieldPrecision = int.MinValue;
 				if (m.Groups[4] != null && m.Groups[4].Value.Length > 0)
-					fieldPrecision = Convert.ToInt32(m.Groups[4].Value);
+					fieldPrecision = Convert.ToInt32(m.Groups[4].Value, CultureInfo.InvariantCulture);
 				#endregion
 
 				#region short / long indicator
@@ -400,7 +400,7 @@ namespace MoonSharp.Interpreter.Interop.LuaStateInterop
 				if (fieldPrecision == int.MinValue &&
 					formatSpecifier != 's' &&
 					formatSpecifier != 'c' &&
-					Char.ToUpper(formatSpecifier) != 'X' &&
+					Char.ToUpper(formatSpecifier, CultureInfo.InvariantCulture) != 'X' &&
 					formatSpecifier != 'o')
 					fieldPrecision = 6;
 
@@ -495,7 +495,7 @@ namespace MoonSharp.Interpreter.Interop.LuaStateInterop
 					#region c - character
 					case 'c':   // character
 						if (IsNumericType(o))
-							w = Convert.ToChar(o).ToString();
+							w = Convert.ToChar(o, CultureInfo.InvariantCulture).ToString();
 						else if (o is char)
 							w = ((char)o).ToString();
 						else if (o is string && ((string)o).Length > 0)
@@ -569,7 +569,7 @@ namespace MoonSharp.Interpreter.Interop.LuaStateInterop
 #if PCL || ENABLE_DOTNET
 							w = ( (IntPtr)o ).ToString();
 #else
-							w = "0x" + ((IntPtr)o).ToString("x");
+							w = $"0x{(IntPtr)o:x}";
 #endif
 						defaultParamIx++;
 						break;
@@ -614,7 +614,7 @@ namespace MoonSharp.Interpreter.Interop.LuaStateInterop
 			string lengthFormat = "{0" + (FieldLength != int.MinValue ?
 											"," + (Left2Right ?
 													"-" :
-													String.Empty) + FieldLength.ToString() :
+													String.Empty) + FieldLength :
 											String.Empty) + "}";
 
 			if (IsNumericType(Value))
@@ -625,7 +625,7 @@ namespace MoonSharp.Interpreter.Interop.LuaStateInterop
 				{
 					if (Alternate && w != "0")
 						w = "0" + w;
-					w = String.Format(lengthFormat, w);
+					w = String.Format(CultureInfo.InvariantCulture, lengthFormat, w);
 				}
 				else
 				{
@@ -649,21 +649,21 @@ namespace MoonSharp.Interpreter.Interop.LuaStateInterop
 			string lengthFormat = "{0" + (FieldLength != int.MinValue ?
 											"," + (Left2Right ?
 													"-" :
-													String.Empty) + FieldLength.ToString() :
+													String.Empty) + FieldLength :
 											String.Empty) + "}";
 			string numberFormat = "{0:" + NativeFormat + (FieldPrecision != int.MinValue ?
-											FieldPrecision.ToString() :
+											FieldPrecision.ToString(CultureInfo.InvariantCulture) :
 											String.Empty) + "}";
 
 			if (IsNumericType(Value))
 			{
-				w = String.Format(numberFormat, Value);
+				w = String.Format(CultureInfo.InvariantCulture, numberFormat, Value);
 
 				if (Left2Right || Padding == ' ')
 				{
 					if (Alternate)
 						w = (NativeFormat == "x" ? "0x" : "0X") + w;
-					w = String.Format(lengthFormat, w);
+					w = String.Format(CultureInfo.InvariantCulture, lengthFormat, w);
 				}
 				else
 				{
@@ -688,10 +688,10 @@ namespace MoonSharp.Interpreter.Interop.LuaStateInterop
 			string lengthFormat = "{0" + (FieldLength != int.MinValue ?
 											"," + (Left2Right ?
 													"-" :
-													String.Empty) + FieldLength.ToString() :
+													String.Empty) + FieldLength :
 											String.Empty) + "}";
 			string numberFormat = "{0:" + NativeFormat + (FieldPrecision != int.MinValue ?
-											FieldPrecision.ToString() :
+											FieldPrecision.ToString(CultureInfo.InvariantCulture) :
 											"0") + "}";
 
 			if (IsNumericType(Value))
@@ -703,7 +703,7 @@ namespace MoonSharp.Interpreter.Interop.LuaStateInterop
 					if (IsPositive(Value, true))
 						w = (PositiveSign ?
 								"+" : (PositiveSpace ? " " : String.Empty)) + w;
-					w = String.Format(lengthFormat, w);
+					w = String.Format(CultureInfo.InvariantCulture, lengthFormat, w);
 				}
 				else
 				{

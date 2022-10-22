@@ -2,6 +2,7 @@
 #pragma warning disable 1591
 
 using System;
+using System.Globalization;
 using System.Text;
 using MoonSharp.Interpreter.Debugging;
 using MoonSharp.Interpreter.REPL;
@@ -37,15 +38,15 @@ namespace MoonSharp.Interpreter.CoreLib
 					DynValue result = interpreter.Evaluate(s);
 
 					if (result != null && result.Type != DataType.Void)
-						script.Options.DebugPrint(string.Format("{0}", result));
+						script.Options.DebugPrint($"{result}");
 				}
 				catch (InterpreterException ex)
 				{
-					script.Options.DebugPrint(string.Format("{0}", ex.DecoratedMessage ?? ex.Message));
+					script.Options.DebugPrint($"{ex.DecoratedMessage ?? ex.Message}");
 				}
 				catch (Exception ex)
 				{
-					script.Options.DebugPrint(string.Format("{0}", ex.Message));
+					script.Options.DebugPrint($"{ex.Message}");
 				}
 			}
 		}
@@ -245,7 +246,7 @@ namespace MoonSharp.Interpreter.CoreLib
 					name = "function '" + wi.Name + "'";
 
 				string loc = wi.Location != null ? wi.Location.FormatLocation(executionContext.GetScript()) : "[clr]";
-				sb.AppendFormat("\t{0}: in {1}\n", loc, name);
+				sb.AppendFormat(CultureInfo.InvariantCulture, "\t{0}: in {1}\n", loc, name);
 			}
 
 			return DynValue.NewString(sb);

@@ -93,7 +93,7 @@ namespace MoonSharp.Interpreter.Execution
 				case OpCode.Meta:
 					return InstructionFieldUsage.NumVal | InstructionFieldUsage.NumVal2 | InstructionFieldUsage.Value | InstructionFieldUsage.Name;
 				default:
-					throw new NotImplementedException(string.Format("InstructionFieldUsage for instruction {0}", (int)op));
+					throw new NotImplementedException($"InstructionFieldUsage for instruction {(int) op}");
 			}
 		}
 	}

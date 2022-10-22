@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -29,7 +30,7 @@ namespace MoonSharp.Interpreter.Platforms
 			{
 				if (PlatformAutoDetector.IsUnityNative)
 				{
-					suffix = "unity." + GetUnityPlatformName().ToLower() + "." + GetUnityRuntimeName();
+					suffix = "unity." + GetUnityPlatformName().ToLower(CultureInfo.InvariantCulture) + "." + GetUnityRuntimeName();
 				}
 				else
 				{

@@ -147,7 +147,8 @@ namespace MoonSharp.Interpreter.Interop
 					}
 					break;
 				default:
-					t.Set("error", DynValue.NewString(string.Format("Wiring of '{0}' value members not supported.", Value.Type.ToErrorTypeString())));
+					t.Set("error", DynValue.NewString(
+						$"Wiring of '{Value.Type.ToErrorTypeString()}' value members not supported."));
 					break;
 			}
 		}

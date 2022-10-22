@@ -57,7 +57,7 @@ namespace MoonSharp.Interpreter
 			Table m = moonsharp_table.Table;
 
 			table.Set("_G", DynValue.NewTable(table));
-			table.Set("_VERSION", DynValue.NewString(string.Format("MoonSharp {0}", Script.VERSION)));
+			table.Set("_VERSION", DynValue.NewString($"MoonSharp {Script.VERSION}"));
 			table.Set("_MOONSHARP", moonsharp_table);
 
 			m.Set("version", DynValue.NewString(Script.VERSION));
@@ -93,7 +93,7 @@ namespace MoonSharp.Interpreter
 					MoonSharpModuleMethodAttribute attr = (MoonSharpModuleMethodAttribute)mi.GetCustomAttributes(typeof(MoonSharpModuleMethodAttribute), false).First();
 
 					if (!CallbackFunction.CheckCallbackSignature(mi, true))
-							throw new ArgumentException(string.Format("Method {0} does not have the right signature.", mi.Name));
+							throw new ArgumentException($"Method {mi.Name} does not have the right signature.");
 
 #if NETFX_CORE
 					Delegate deleg = mi.CreateDelegate(typeof(Func<ScriptExecutionContext, CallbackArguments, DynValue>));
@@ -149,7 +149,7 @@ namespace MoonSharp.Interpreter
 			}
 			else
 			{
-				throw new ArgumentException(string.Format("Field {0} does not have the right type - it must be string or double.", name));
+				throw new ArgumentException($"Field {name} does not have the right type - it must be string or double.");
 			}
 		}
 
@@ -157,7 +157,7 @@ namespace MoonSharp.Interpreter
 		{
 			if (fi.FieldType != typeof(string))
 			{
-				throw new ArgumentException(string.Format("Field {0} does not have the right type - it must be string.", name));
+				throw new ArgumentException($"Field {name} does not have the right type - it must be string.");
 			}
 
 			string val = fi.GetValue(o) as string;

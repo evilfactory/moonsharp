@@ -185,7 +185,7 @@ namespace MoonSharp.Interpreter.Interop
 					ParameterDescriptor[] set_pars = new ParameterDescriptor[rank + 1];
 
 					for (int i = 0; i < rank; i++)
-						get_pars[i] = set_pars[i] = new ParameterDescriptor("idx" + i.ToString(), typeof(int));
+						get_pars[i] = set_pars[i] = new ParameterDescriptor("idx" + i, typeof(int));
 
 					set_pars[rank] = new ParameterDescriptor("value", Type.GetElementType());
 

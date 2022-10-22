@@ -2,6 +2,7 @@
 #pragma warning disable 1591
 
 using System;
+using System.Globalization;
 using lua_Integer = System.Int32;
 
 namespace MoonSharp.Interpreter.Interop.LuaStateInterop
@@ -64,10 +65,10 @@ namespace MoonSharp.Interpreter.Interop.LuaStateInterop
 		protected static bool isalnum(int c) { return Char.IsLetterOrDigit((char)c); }
 		protected static bool isgraph(int c) { return !Char.IsControl((char)c) && !Char.IsWhiteSpace((char)c); }
 
-		protected static char tolower(char c) { return Char.ToLower(c); }
-		protected static char toupper(char c) { return Char.ToUpper(c); }
-		protected static char tolower(int c) { return Char.ToLower((char)c); }
-		protected static char toupper(int c) { return Char.ToUpper((char)c); }
+		protected static char tolower(char c) { return Char.ToLower(c, CultureInfo.InvariantCulture); }
+		protected static char toupper(char c) { return Char.ToUpper(c, CultureInfo.InvariantCulture); }
+		protected static char tolower(int c) { return Char.ToLower((char)c, CultureInfo.InvariantCulture); }
+		protected static char toupper(int c) { return Char.ToUpper((char)c, CultureInfo.InvariantCulture); }
 
 
 		// find c in str

@@ -19,7 +19,7 @@ namespace MoonSharp.Interpreter.Execution.Scopes
 		{
 			SymbolRef sref = m_DefinedNames[name];
 			m_DefinedNames.Remove(name);
-			m_DefinedNames.Add(string.Format("@{0}_{1}", name, Guid.NewGuid().ToString("N")), sref);
+			m_DefinedNames.Add($"@{name}_{Guid.NewGuid().ToString("N")}", sref);
 		}
 
 		internal BuildTimeScopeBlock(BuildTimeScopeBlock parent)

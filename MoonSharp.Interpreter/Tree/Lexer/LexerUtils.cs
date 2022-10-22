@@ -21,7 +21,7 @@ namespace MoonSharp.Interpreter.Tree
 		public static double ParseHexInteger(Token T)
 		{
 			string txt = T.Text;
-			if ((txt.Length < 2) || (txt[0] != '0' && (char.ToUpper(txt[1]) != 'X')))
+			if ((txt.Length < 2) || (txt[0] != '0' && (char.ToUpper(txt[1], CultureInfo.InvariantCulture) != 'X')))
 				throw new InternalErrorException("hex numbers must start with '0x' near '{0}'.", txt);
 
 			ulong res;
@@ -62,7 +62,7 @@ namespace MoonSharp.Interpreter.Tree
 
 			try
 			{
-				if ((s.Length < 2) || (s[0] != '0' && (char.ToUpper(s[1]) != 'X')))
+				if ((s.Length < 2) || (s[0] != '0' && (char.ToUpper(s[1], CultureInfo.InvariantCulture) != 'X')))
 					throw new InternalErrorException("hex float must start with '0x' near '{0}'", s);
 
 				s = s.Substring(2);
@@ -80,7 +80,7 @@ namespace MoonSharp.Interpreter.Tree
 
 				exp *= -4;
 
-				if (s.Length > 0 && char.ToUpper(s[0]) == 'P')
+				if (s.Length > 0 && char.ToUpper(s[0], CultureInfo.InvariantCulture) == 'P')
 				{
 					if (s.Length == 1)
 						throw new SyntaxErrorException(T, "invalid hex float format near '{0}'", s);

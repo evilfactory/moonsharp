@@ -58,10 +58,10 @@ namespace MoonSharp.Interpreter.Tree.Fast_Interface
 				using (script.PerformanceStats.StartStopwatch(Diagnostics.PerformanceCounter.Compilation))
 				using (bytecode.EnterSource(null))
 				{
-					bytecode.Emit_Nop(string.Format("Begin chunk {0}", source.Name));
+					bytecode.Emit_Nop($"Begin chunk {source.Name}");
 					beginIp = bytecode.GetJumpPointForLastInstruction();
 					stat.Compile(bytecode);
-					bytecode.Emit_Nop(string.Format("End chunk {0}", source.Name));
+					bytecode.Emit_Nop($"End chunk {source.Name}");
 				}
 
 				//Debug_DumpByteCode(bytecode, source.SourceID);
@@ -94,9 +94,9 @@ namespace MoonSharp.Interpreter.Tree.Fast_Interface
 				using (script.PerformanceStats.StartStopwatch(Diagnostics.PerformanceCounter.Compilation))
 				using (bytecode.EnterSource(null))
 				{
-					bytecode.Emit_Nop(string.Format("Begin function {0}", source.Name));
+					bytecode.Emit_Nop($"Begin function {source.Name}");
 					beginIp = fnx.CompileBody(bytecode, source.Name);
-					bytecode.Emit_Nop(string.Format("End function {0}", source.Name));
+					bytecode.Emit_Nop($"End function {source.Name}");
 				}
 
 				//Debug_DumpByteCode(bytecode, source.SourceID);

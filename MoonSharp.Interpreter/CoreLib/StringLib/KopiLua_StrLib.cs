@@ -324,19 +324,21 @@ namespace MoonSharp.Interpreter.CoreLib.StringLib
 			p = new CharPtr(p);
 			if (ms.matchdepth-- == 0)
 				LuaLError(ms.L, "pattern too complex");
-		init: /* using goto's to optimize tail recursion */
+			init: /* using goto's to optimize tail recursion */
 			switch (p[0])
 			{
 				case '(':
 					{  /* start capture */
 						if (p[1] == ')')  /* position capture? */
-							return start_capture(ms, s, p + 2, CAP_POSITION);
+							s = start_capture(ms, s, p + 2, CAP_POSITION);
 						else
-							return start_capture(ms, s, p + 1, CAP_UNFINISHED);
+							s = start_capture(ms, s, p + 1, CAP_UNFINISHED);
+						break;
 					}
 				case ')':
 					{  /* end capture */
-						return end_capture(ms, s, p + 1);
+						s = end_capture(ms, s, p + 1);
+						break;
 					}
 				case L_ESC:
 					{
@@ -345,8 +347,14 @@ namespace MoonSharp.Interpreter.CoreLib.StringLib
 							case 'b':
 								{  /* balanced string? */
 									s = matchbalance(ms, s, p + 2);
-									if (s == null) return null;
-									p += 4; goto init;  /* else return match(ms, s, p+4); */
+									if (s != null)
+									{
+										p += 4;
+										goto init;
+										/* else return match(ms, s, p+4); */
+									}
+
+									break;
 								}
 							case 'f':
 								{  /* frontier? */
@@ -358,62 +366,47 @@ namespace MoonSharp.Interpreter.CoreLib.StringLib
 									ep = classend(ms, p);  /* points to what is next */
 									previous = (s == ms.src_init) ? '\0' : s[-1];
 									if ((matchbracketclass(previous, p, ep - 1) != 0) ||
-									   (matchbracketclass(s[0], p, ep - 1) == 0)) return null;
+									    (matchbracketclass(s[0], p, ep - 1) == 0))
+									{
+										s = null;
+										break;
+									}
 									p = ep; goto init;  /* else return match(ms, s, ep); */
 								}
 							default:
 								{
-									if (isdigit((char)(p[1])))
+									if (isdigit(p[1]))
 									{  /* capture results (%0-%9)? */
 										s = match_capture(ms, s, p[1]);
-										if (s == null) return null;
-										p += 2; goto init;  /* else return match(ms, s, p+2) */
-									}
-									//ismeretlen hiba miatt lett ide átmásolva
-									{  /* it is a pattern item */
-										CharPtr ep = classend(ms, p);  /* points to what is next */
-										int m = (s < ms.src_end) && (singlematch(s[0], p, ep) != 0) ? 1 : 0;
-										switch (ep[0])
+										if (s != null)
 										{
-											case '?':
-												{  /* optional */
-													CharPtr res;
-													if ((m != 0) && ((res = match(ms, s + 1, ep + 1)) != null))
-														return res;
-													p = ep + 1; goto init;  /* else return match(ms, s, ep+1); */
-												}
-											case '*':
-												{  /* 0 or more repetitions */
-													return max_expand(ms, s, p, ep);
-												}
-											case '+':
-												{  /* 1 or more repetitions */
-													return ((m != 0) ? max_expand(ms, s + 1, p, ep) : null);
-												}
-											case '-':
-												{  /* 0 or more repetitions (minimum) */
-													return min_expand(ms, s, p, ep);
-												}
-											default:
-												{
-													if (m == 0) return null;
-													s = s.next(); p = ep; goto init;  /* else return match(ms, s+1, ep); */
-												}
+											p += 2;
+											goto init;
+											/* else return match(ms, s, p+2) */
 										}
+
+										break;
 									}
-									//goto dflt;  /* case default */
+									goto dflt;  /* case default */
 								}
 						}
+
+						break;
 					}
 				case '\0':
 					{  /* end of pattern */
-						return s;  /* match succeeded */
+						break; /* match succeeded */
 					}
 				case '$':
 					{
-						if (p[1] == '\0')  /* is the `$' the last char in pattern? */
-							return (s == ms.src_end) ? s : null;  /* check end of string */
-						else goto dflt;
+						if (p[1] == '\0') /* is the `$' the last char in pattern? */
+						{
+							/* check end of string */
+							s = (s == ms.src_end) ? s : null;
+							break;
+						}
+						
+						goto dflt;
 					}
 				default:
 				dflt:
@@ -426,29 +419,44 @@ namespace MoonSharp.Interpreter.CoreLib.StringLib
 								{  /* optional */
 									CharPtr res;
 									if ((m != 0) && ((res = match(ms, s + 1, ep + 1)) != null))
-										return res;
+									{
+										s = res;
+										break;
+									}
 									p = ep + 1; goto init;  /* else return match(ms, s, ep+1); */
 								}
 							case '*':
 								{  /* 0 or more repetitions */
-									return max_expand(ms, s, p, ep);
+									s = max_expand(ms, s, p, ep);
+									break;
 								}
 							case '+':
 								{  /* 1 or more repetitions */
-									return ((m != 0) ? max_expand(ms, s + 1, p, ep) : null);
+									s = ((m != 0) ? max_expand(ms, s + 1, p, ep) : null);
+									break;
 								}
 							case '-':
 								{  /* 0 or more repetitions (minimum) */
-									return min_expand(ms, s, p, ep);
+									s = min_expand(ms, s, p, ep);
+									break;
 								}
 							default:
 								{
-									if (m == 0) return null;
+									if (m == 0)
+									{
+										s = null;
+										break;
+									}
 									s = s.next(); p = ep; goto init;  /* else return match(ms, s+1, ep); */
 								}
 						}
+
+						break;
 					}
 			}
+
+			ms.matchdepth++;
+			return s;
 		}
 
 
@@ -835,9 +843,9 @@ namespace MoonSharp.Interpreter.CoreLib.StringLib
 								}
 
 								if (isfollowedbynum)
-									LuaLAddString(b, string.Format("\\{0:000}", (int)s[0]));
+									LuaLAddString(b, $"\\{(int) s[0]:000}");
 								else
-									LuaLAddString(b, string.Format("\\{0}", (int)s[0]));
+									LuaLAddString(b, $"\\{(int) s[0]}");
 							}
 							else
 							{

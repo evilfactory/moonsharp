@@ -6,6 +6,7 @@ using MoonSharp.Interpreter.Compatibility;
 using MoonSharp.Interpreter.DataStructs;
 using MoonSharp.Interpreter.Interop.BasicDescriptors;
 using MoonSharp.Interpreter.Interop.StandardDescriptors;
+using ReferenceEqualityComparer = MoonSharp.Interpreter.DataStructs.ReferenceEqualityComparer;
 
 namespace MoonSharp.Interpreter.Interop
 {
@@ -104,7 +105,8 @@ namespace MoonSharp.Interpreter.Interop
 
 			if (pars.Length > MAX_ARGS_IN_DELEGATE)
 			{
-				if (throwException) throw new ArgumentException(string.Format("Event handler cannot have more than {0} parameters", MAX_ARGS_IN_DELEGATE));
+				if (throwException) throw new ArgumentException(
+					$"Event handler cannot have more than {MAX_ARGS_IN_DELEGATE} parameters");
 				return false;
 			}
 
@@ -174,7 +176,7 @@ namespace MoonSharp.Interpreter.Interop
 		{
 			lock (m_Lock)
 			{
-				Closure closure = args.AsType(0, string.Format("userdata<{0}>.{1}.add", EventInfo.DeclaringType, EventInfo.Name),
+				Closure closure = args.AsType(0, $"userdata<{EventInfo.DeclaringType}>.{EventInfo.Name}.add",
 					DataType.Function, false).Function;
 
 				if (m_Callbacks.Add(o, closure))
@@ -188,7 +190,7 @@ namespace MoonSharp.Interpreter.Interop
 		{
 			lock (m_Lock)
 			{
-				Closure closure = args.AsType(0, string.Format("userdata<{0}>.{1}.remove", EventInfo.DeclaringType, EventInfo.Name),
+				Closure closure = args.AsType(0, $"userdata<{EventInfo.DeclaringType}>.{EventInfo.Name}.remove",
 					DataType.Function, false).Function;
 
 				if (m_Callbacks.RemoveValue(o, closure))

@@ -228,9 +228,9 @@ namespace MoonSharp.Interpreter.Execution.VM
 							if (instructionPtr == YIELD_SPECIAL_TRAP) goto yield_to_calling_coroutine;
 							break;
 						case OpCode.Invalid:
-							throw new NotImplementedException(string.Format("Invalid opcode : {0}", i.Name));
+							throw new NotImplementedException($"Invalid opcode : {i.Name}");
 						default:
-							throw new NotImplementedException(string.Format("Execution for {0} not implented yet!", i.OpCode));
+							throw new NotImplementedException($"Execution for {i.OpCode} not implented yet!");
 					}
 				}
 
