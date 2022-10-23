@@ -29,8 +29,9 @@ namespace MoonSharp.Interpreter.Interop
 			if (mi == null)
 				return false;
 
-			MoonSharpVisibleAttribute va = mi.GetCustomAttributes(true).OfType<MoonSharpVisibleAttribute>().SingleOrDefault();
-			MoonSharpHiddenAttribute ha = mi.GetCustomAttributes(true).OfType<MoonSharpHiddenAttribute>().SingleOrDefault();
+			var customAttributes = mi.GetCustomAttributes(true);
+			var va = customAttributes.OfType<MoonSharpVisibleAttribute>().SingleOrDefault();
+			var ha = customAttributes.OfType<MoonSharpHiddenAttribute>().SingleOrDefault();
 
 			if (va != null && ha != null && va.Visible)
 				throw new InvalidOperationException(

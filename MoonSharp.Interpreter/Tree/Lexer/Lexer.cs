@@ -1,18 +1,21 @@
-﻿using System.Text;
+﻿using System;
+using System.Linq;
+using System.Text;
 
 namespace MoonSharp.Interpreter.Tree
 {
-	class Lexer
+	internal class Lexer
 	{
-		Token m_Current = null;
-		string m_Code;
-		int m_PrevLineTo = 0;
-		int m_PrevColTo = 1;
-		int m_Cursor = 0;
-		int m_Line = 1;
-		int m_Col = 0;
-		int m_SourceId;
-		bool m_AutoSkipComments = false;
+		private Token m_Current = null;
+		private readonly string m_Code;
+		private int m_PrevLineTo = 0;
+		private int m_PrevColTo = 1;
+		private int m_Cursor = 0;
+		private readonly int m_StartCursor = 0;
+		private int m_Line = 1;
+		private int m_Col = 0;
+		private readonly int m_SourceId;
+		private readonly bool m_AutoSkipComments = false;
 
 		public Lexer(int sourceID, string scriptContent, bool autoSkipComments)
 		{
@@ -21,7 +24,10 @@ namespace MoonSharp.Interpreter.Tree
 
 			// remove unicode BOM if any
 			if (m_Code.Length > 0 && m_Code[0] == 0xFEFF)
-				m_Code = m_Code.Substring(1);
+			{
+				m_StartCursor = 1;
+				m_Cursor = 1;
+			}
 
 			m_AutoSkipComments = autoSkipComments;
 		}
@@ -206,7 +212,7 @@ namespace MoonSharp.Interpreter.Tree
 				case '$':
 					return PotentiallyDoubleCharOperator('{', TokenType.Op_Dollar, TokenType.Brk_Open_Curly_Shared, fromLine, fromCol);
 				case '#':
-					if (m_Cursor == 0 && m_Code.Length > 1 && m_Code[1] == '!')
+					if (m_Cursor == m_StartCursor && m_Code.Length > m_StartCursor + 1 && m_Code[m_StartCursor + 1] == '!')
 						return ReadHashBang(fromLine, fromCol);
 
 					return CreateSingleCharToken(TokenType.Op_Len, fromLine, fromCol);
