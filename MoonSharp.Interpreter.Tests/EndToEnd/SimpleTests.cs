@@ -1589,5 +1589,4 @@ namespace MoonSharp.Interpreter.Tests.EndToEnd
 		}
 
 	}
-
 }

@@ -27,5 +27,6 @@ namespace MoonSharp.Interpreter.Tests.Units
 				stack.Push(0);
 			stack.CropAtCount(3);
 		}
+		
 	}
 }
