@@ -1,5 +1,6 @@
 ﻿using MoonSharp.Interpreter.Interop;
 using MoonSharp.Interpreter.Platforms;
+using System;
 
 namespace MoonSharp.Interpreter
 {
@@ -39,6 +40,12 @@ namespace MoonSharp.Interpreter
 		/// <c>someuserdata.SomeMethod()</c> will also be tried.
 		/// </summary>
 		public FuzzySymbolMatchingBehavior FuzzySymbolMatching { get; set; }
+
+		/// <summary>
+		/// Gets or set a function that determines whether an exceptio not inheriting from <see cref="ScriptRuntimeException"/>
+		/// should be caught by <c>pcall</c>. Defaults to always return false.
+		/// </summary>
+		public Func<Exception, bool> ShouldPCallCatchException { get; set; } = _ => false;
 
 	}
 }
