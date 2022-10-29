@@ -1,7 +1,9 @@
 ﻿// Disable warnings about XML documentation
 #pragma warning disable 1591
 
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace MoonSharp.Interpreter.CoreLib
 {
@@ -57,10 +59,21 @@ namespace MoonSharp.Interpreter.CoreLib
 						return DynValue.NewTupleNested(DynValue.True, ret);
 					}
 				}
-				catch (ScriptRuntimeException ex)
+				catch (Exception ex)
 				{
-					executionContext.PerformMessageDecorationBeforeUnwind(handlerBeforeUnwind, ex);
-					return DynValue.NewTupleNested(DynValue.False, DynValue.NewString(ex.DecoratedMessage));
+					if (ex is TargetInvocationException)
+						ex = ex.InnerException;
+
+					if (ex is ScriptRuntimeException iex)
+					{
+						executionContext.PerformMessageDecorationBeforeUnwind(handlerBeforeUnwind, iex);
+						return DynValue.NewTupleNested(DynValue.False, DynValue.NewString(iex.DecoratedMessage));
+					}
+
+					if (Script.GlobalOptions.ShouldPCallCatchException(ex))
+						return DynValue.NewTupleNested(DynValue.False, DynValue.NewString(ex?.ToString()));
+					else
+						throw;
 				}
 			}
 			else if (args[0].Type != DataType.Function)

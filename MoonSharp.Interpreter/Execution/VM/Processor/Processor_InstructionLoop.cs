@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using MoonSharp.Interpreter.DataStructs;
 using MoonSharp.Interpreter.Debugging;
 using MoonSharp.Interpreter.Interop;
@@ -244,21 +245,25 @@ namespace MoonSharp.Interpreter.Execution.VM
 					throw ScriptRuntimeException.CannotYieldMain();
 				else
 					throw ScriptRuntimeException.CannotYield();
-
-			}
-			catch (InterpreterException ex)
+				}
+			catch (Exception ex)
 			{
-				FillDebugData(ex, instructionPtr);
+				if (ex is TargetInvocationException)
+					ex = ex.InnerException;
 
-				if (!(ex is ScriptRuntimeException))
-				{
-					ex.Rethrow();
-					throw;
+				var iex = ex as InterpreterException ?? new NetRuntimeException(ex);
+				FillDebugData(iex, instructionPtr);
+				
+				for (int i = 0; i < m_ExecutionStack.Count; i++) {
+					var c = m_ExecutionStack.Peek(i);
+
+					if (c.ErrorHandlerBeforeUnwind != null)
+						iex.DecoratedMessage = PerformMessageDecorationBeforeUnwind(c.ErrorHandlerBeforeUnwind, iex.DecoratedMessage, GetCurrentSourceRef(instructionPtr));
 				}
 
-				if (m_Debug.DebuggerAttached != null)
+				if (ex is ScriptRuntimeException sex && m_Debug.DebuggerAttached != null)
 				{
-					if (m_Debug.DebuggerAttached.SignalRuntimeException((ScriptRuntimeException)ex))
+					if (m_Debug.DebuggerAttached.SignalRuntimeException(sex))
 					{
 						if (instructionPtr >= 0 && instructionPtr < this.m_RootChunk.Code.Count)
 						{
@@ -266,15 +271,6 @@ namespace MoonSharp.Interpreter.Execution.VM
 						}
 					}
 				}
-
-				for (int i = 0; i < m_ExecutionStack.Count; i++)
-				{
-					var c = m_ExecutionStack.Peek(i);
-
-					if (c.ErrorHandlerBeforeUnwind != null)
-						ex.DecoratedMessage = PerformMessageDecorationBeforeUnwind(c.ErrorHandlerBeforeUnwind, ex.DecoratedMessage, GetCurrentSourceRef(instructionPtr));
-				}
-
 
 				while (m_ExecutionStack.Count > 0)
 				{
@@ -290,7 +286,7 @@ namespace MoonSharp.Interpreter.Execution.VM
 							m_ValueStack.RemoveLast(argscnt + 1);
 						}
 
-						var cbargs = new DynValue[] { DynValue.NewString(ex.DecoratedMessage) };
+						var cbargs = new DynValue[] { DynValue.NewString(iex.DecoratedMessage) };
 
 						DynValue handled = csi.ErrorHandler.Invoke(new ScriptExecutionContext(this, csi.ErrorHandler, GetCurrentSourceRef(instructionPtr)), cbargs);
 
@@ -300,23 +296,16 @@ namespace MoonSharp.Interpreter.Execution.VM
 					}
 					else if ((csi.Flags & CallStackItemFlags.EntryPoint) != 0)
 					{
-						ex.Rethrow();
-						throw;
+						break;
 					}
 				}
 
-				ex.Rethrow();
-				throw;
-            }
-            catch (Exception ex)
-            {
-				NetRuntimeException exception = new NetRuntimeException(ex);
-
-				FillDebugData(exception, instructionPtr);
-
-
-				throw exception;
-            }
+				iex.Rethrow();
+				if (ex is InterpreterException)
+					throw;
+				else
+					throw iex;
+			}
 
 		return_to_native_code:
 			return m_ValueStack.Pop();

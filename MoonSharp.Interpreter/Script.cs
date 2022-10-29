@@ -39,23 +39,6 @@ namespace MoonSharp.Interpreter
 		Table[] m_TypeMetatables = new Table[(int)LuaTypeExtensions.MaxMetaTypes];
 
 		/// <summary>
-		/// Initializes the <see cref="Script"/> class.
-		/// </summary>
-		static Script()
-		{
-			GlobalOptions = new ScriptGlobalOptions();
-
-			DefaultOptions = new ScriptOptions()
-			{
-				DebugPrint = s => { Script.GlobalOptions.Platform.DefaultPrint(s); },
-				DebugInput = s => { return Script.GlobalOptions.Platform.DefaultInput(s); },
-				CheckThreadAccess = true,
-				ScriptLoader = PlatformAutoDetector.GetDefaultScriptLoader(),
-				TailCallOptimizationThreshold = 65536
-			};
-		}
-
-		/// <summary>
 		/// Initializes a new instance of the <see cref="Script"/> clas.s
 		/// </summary>
 		public Script()
@@ -83,7 +66,13 @@ namespace MoonSharp.Interpreter
 		/// Gets or sets the script loader which will be used as the value of the
 		/// ScriptLoader property for all newly created scripts.
 		/// </summary>
-		public static ScriptOptions DefaultOptions { get; private set; }
+		public static ScriptOptions DefaultOptions { get; } = new ScriptOptions() {
+			DebugPrint = s => { Script.GlobalOptions.Platform.DefaultPrint(s); },
+			DebugInput = s => { return Script.GlobalOptions.Platform.DefaultInput(s); },
+			CheckThreadAccess = true,
+			ScriptLoader = PlatformAutoDetector.GetDefaultScriptLoader(),
+			TailCallOptimizationThreshold = 65536,
+		};
 
 		/// <summary>
 		/// Gets access to the script options. 
@@ -93,7 +82,7 @@ namespace MoonSharp.Interpreter
 		/// <summary>
 		/// Gets the global options, that is options which cannot be customized per-script.
 		/// </summary>
-		public static ScriptGlobalOptions GlobalOptions { get; private set; }
+		public static ScriptGlobalOptions GlobalOptions { get; } = new ScriptGlobalOptions();
 
 		/// <summary>
 		/// Gets access to performance statistics.
