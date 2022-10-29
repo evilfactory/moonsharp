@@ -1,6 +1,4 @@
 ﻿
-using System;
-
 namespace MoonSharp.Interpreter
 {
 	/// <summary>

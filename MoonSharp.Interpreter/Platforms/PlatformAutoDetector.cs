@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using MoonSharp.Interpreter.Interop;
 using MoonSharp.Interpreter.Loaders;
 
 namespace MoonSharp.Interpreter.Platforms

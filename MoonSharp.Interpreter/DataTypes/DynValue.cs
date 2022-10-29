@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using MoonSharp.Interpreter.Execution;
-using MoonSharp.Interpreter.Execution.VM;
-using System.Collections;
 
 namespace MoonSharp.Interpreter
 {

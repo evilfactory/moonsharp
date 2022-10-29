@@ -131,14 +131,9 @@ namespace MoonSharp.Interpreter.Tree
 			return m_Cursor < m_Code.Length;
 		}
 
-		private bool IsWhiteSpace(char c)
-		{
-			return char.IsWhiteSpace(c);
-		}
-
 		private void SkipWhiteSpace()
 		{
-			for (; CursorNotEof() && IsWhiteSpace(CursorChar()); CursorNext())
+			for (; CursorNotEof() && char.IsWhiteSpace(CursorChar()); CursorNext())
 			{
 			}
 		}
@@ -182,7 +177,7 @@ namespace MoonSharp.Interpreter.Tree
 						char next = CursorCharNext();
 						if (next == '.')
 							return PotentiallyDoubleCharOperator('.', TokenType.Op_Concat, TokenType.VarArgs, fromLine, fromCol);
-						else if (LexerUtils.CharIsDigit(next))
+						else if (char.IsDigit(next))
 							return ReadNumberToken(fromLine, fromCol, true);
 						else
 							return CreateToken(TokenType.Dot, fromLine, fromCol, ".");
@@ -255,7 +250,7 @@ namespace MoonSharp.Interpreter.Tree
 							string name = ReadNameToken();
 							return CreateNameToken(name, fromLine, fromCol);
 						}
-						else if (LexerUtils.CharIsDigit(c))
+						else if (char.IsDigit(c))
 						{
 							return ReadNumberToken(fromLine, fromCol, false);
 						}
@@ -374,7 +369,7 @@ namespace MoonSharp.Interpreter.Tree
 					exponentSignAllowed = false;
 					text.Append(c);
 				}
-				else if (LexerUtils.CharIsDigit(c))
+				else if (char.IsDigit(c))
 				{
 					text.Append(c);
 				}

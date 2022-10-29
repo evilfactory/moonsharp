@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using MoonSharp.Interpreter.CoreLib;
-using MoonSharp.Interpreter.Execution;
-using MoonSharp.Interpreter.Loaders;
-using MoonSharp.Interpreter.Platforms;
+﻿using MoonSharp.Interpreter.Loaders;
 using NUnit.Framework;
 
 namespace MoonSharp.Interpreter.Tests

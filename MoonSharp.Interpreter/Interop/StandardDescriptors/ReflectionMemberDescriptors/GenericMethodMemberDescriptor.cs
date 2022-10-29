@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using MoonSharp.Interpreter.Compatibility;
-using MoonSharp.Interpreter.Diagnostics;
 using MoonSharp.Interpreter.Interop.BasicDescriptors;
 using MoonSharp.Interpreter.Interop.Converters;
 
@@ -30,9 +27,6 @@ namespace MoonSharp.Interpreter.Interop
 		/// </summary>
 		public bool IsConstructor { get; private set; }
 
-
-		private Func<object, object[], object> m_OptimizedFunc = null;
-		private Action<object, object[]> m_OptimizedAction = null;
 		private bool m_IsAction = false;
 		private bool m_IsArrayCtor = false;
 
