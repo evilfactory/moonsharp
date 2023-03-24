@@ -27,31 +27,30 @@ namespace MoonSharp.VsCodeDebugger
 		ManualResetEvent m_StopEvent = new ManualResetEvent(false);
 		bool m_Started = false;
 		int m_Port;
+		TcpListener m_ServerSocket;
+
+		/// <summary>
+		/// Has the server started?
+		/// </summary>
+		public bool IsStarted
+		{
+			get { return m_Started; }
+		}
+
+		/// <summary>
+		/// Current listening port.
+		/// </summary>
+		public int Port
+		{
+			get { return m_Port; }
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MoonSharpVsCodeDebugServer" /> class.
 		/// </summary>
 		/// <param name="port">The port on which the debugger listens. It's recommended to use 41912.</param>
-		public MoonSharpVsCodeDebugServer(int port = 41912)
+		public MoonSharpVsCodeDebugServer()
 		{
-			m_Port = port;
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="MoonSharpVsCodeDebugServer" /> class with a default script.
-		/// Note that for this specific script, it will NOT attach the debugger to the script.
-		/// </summary>
-		/// <param name="script">The script object to debug.</param>
-		/// <param name="port">The port on which the debugger listens. It's recommended to use 41912 unless you are going to keep more than one script object around.</param>
-		/// <param name="sourceFinder">A function which gets in input a source code and returns the path to
-		/// source file to use. It can return null and in that case (or if the file cannot be found)
-		/// a temporary file will be generated on the fly.</param>
-		[Obsolete("Use the constructor taking only a port, and the 'Attach' method instead.")]
-		public MoonSharpVsCodeDebugServer(Script script, int port, Func<SourceCode, string> sourceFinder = null)
-		{
-			m_Port = port;
-			m_Current = new AsyncDebugger(script, sourceFinder ?? (s => s.Name), "Default script");
-			m_DebuggerList.Add(m_Current);
 		}
 
 		/// <summary>
@@ -127,7 +126,7 @@ namespace MoonSharp.VsCodeDebugger
 		/// </summary>
 		public Script Current
 		{
-			get { lock(m_Lock) return m_Current != null ? m_Current.Script : null; }
+			get { lock (m_Lock) return m_Current != null ? m_Current.Script : null; }
 			set
 			{
 				lock (m_Lock)
@@ -182,43 +181,50 @@ namespace MoonSharp.VsCodeDebugger
 		/// </summary>
 		public Action<string> Logger { get; set; }
 
-		
+
 		/// <summary>
 		/// Gets the debugger object. Obsolete, use the new interface using the Attach method instead.
 		/// </summary>
 		[Obsolete("Use the Attach method instead.")]
 		public IDebugger GetDebugger()
 		{
-			lock(m_Lock)
+			lock (m_Lock)
 				return m_Current;
 		}
 
-		/// <summary>
-		/// Stops listening
-		/// </summary>
-		/// <exception cref="InvalidOperationException">Cannot stop; server was not started.</exception>
 		public void Dispose()
 		{
+			Stop();
+		}
+
+		/// <summary>
+		/// Stops listening on the localhost for incoming connections.
+		/// </summary>
+		public void Stop()
+		{
 			m_StopEvent.Set();
+			m_ServerSocket?.Stop();
+			m_Started = false;
 		}
 
 		/// <summary>
 		/// Starts listening on the localhost for incoming connections.
 		/// </summary>
-		public MoonSharpVsCodeDebugServer Start()
+		public MoonSharpVsCodeDebugServer Start(int port = 41912)
 		{
 			lock (m_Lock)
 			{
 				if (m_Started)
 					throw new InvalidOperationException("Cannot start; server has already been started.");
 
+				m_Port = port;
+
 				m_StopEvent.Reset();
 
-				TcpListener serverSocket = null;
-				serverSocket = new TcpListener(IPAddress.Parse("127.0.0.1"), m_Port);
-				serverSocket.Start();
+				m_ServerSocket = new TcpListener(IPAddress.Parse("127.0.0.1"), m_Port);
+				m_ServerSocket.Start();
 
-				SpawnThread($"VsCodeDebugServer_{m_Port}", () => ListenThread(serverSocket));
+				SpawnThread($"VsCodeDebugServer_{m_Port}", () => ListenThread(m_ServerSocket));
 
 				m_Started = true;
 
