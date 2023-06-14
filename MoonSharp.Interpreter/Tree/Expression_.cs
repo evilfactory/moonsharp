@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MoonSharp.Interpreter.Execution;
+using MoonSharp.Interpreter.ILCompilation;
 using MoonSharp.Interpreter.Tree.Expressions;
 
 namespace MoonSharp.Interpreter.Tree
@@ -8,12 +10,23 @@ namespace MoonSharp.Interpreter.Tree
 	{
 		public Expression(ScriptLoadingContext lcontext)
 			: base(lcontext)
-		{ }
+		{
+			_ilType = new(GetIlType);
+		}
 
 		public virtual string GetFriendlyDebugName()
 		{
 			return null;
 		}
+
+		protected virtual ILType GetIlType()
+		{
+			Console.WriteLine(this.GetType().Name);
+			return ILType.Nil;
+		}
+
+		private readonly Lazy<ILType> _ilType;
+		public ILType Type => _ilType.Value;
 
 		public abstract DynValue Eval(ScriptExecutionContext context);
 

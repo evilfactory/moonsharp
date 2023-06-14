@@ -1,5 +1,8 @@
-﻿using MoonSharp.Interpreter.Execution;
+﻿using System;
+using System.Reflection.Emit;
+using MoonSharp.Interpreter.Execution;
 using MoonSharp.Interpreter.Execution.VM;
+using MoonSharp.Interpreter.ILCompilation;
 
 namespace MoonSharp.Interpreter.Tree
 {
@@ -15,6 +18,11 @@ namespace MoonSharp.Interpreter.Tree
 
 
 		public abstract void Compile(ByteCode bc);
+
+		public virtual void CompileIl(CompileOptions compileOptions)
+		{
+			Console.WriteLine(this.GetType().Name);
+		}
 
 
 		protected static Token UnexpectedTokenType(Token t)

@@ -1,4 +1,7 @@
 ﻿
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Test")]
 namespace MoonSharp.Interpreter.Execution.VM
 {
 	internal enum OpCode

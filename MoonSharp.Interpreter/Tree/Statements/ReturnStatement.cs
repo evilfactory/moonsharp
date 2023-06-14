@@ -1,6 +1,7 @@
-﻿using MoonSharp.Interpreter.Debugging;
+﻿using System.Reflection.Emit;
+using MoonSharp.Interpreter.Debugging;
 using MoonSharp.Interpreter.Execution;
-
+using MoonSharp.Interpreter.ILCompilation;
 using MoonSharp.Interpreter.Tree.Expressions;
 
 namespace MoonSharp.Interpreter.Tree.Statements
@@ -59,6 +60,28 @@ namespace MoonSharp.Interpreter.Tree.Statements
 					bc.Emit_Ret(0);
 				}
 			}
+		}
+
+		public override void CompileIl(CompileOptions compileOptions)
+		{
+			if (m_Expression != null)
+			{
+				var ilTypes = m_Expression.Type;
+				
+				if (ilTypes.IsSingle())
+				{
+					m_Expression.CompileIl(compileOptions);
+					ilTypes.EmitBox(compileOptions.Il);
+				}
+				else
+				{
+					m_Expression.CompileIl(compileOptions with { Box = true });
+				}
+			} else {
+
+			}
+
+			compileOptions.Il.Emit(OpCodes.Ret);
 		}
 	}
 }

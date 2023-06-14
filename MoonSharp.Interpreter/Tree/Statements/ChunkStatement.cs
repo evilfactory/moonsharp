@@ -1,5 +1,7 @@
-﻿using MoonSharp.Interpreter.Execution;
+﻿using System.Reflection.Emit;
+using MoonSharp.Interpreter.Execution;
 using MoonSharp.Interpreter.Execution.VM;
+using MoonSharp.Interpreter.ILCompilation;
 
 namespace MoonSharp.Interpreter.Tree.Statements
 {
@@ -42,6 +44,11 @@ namespace MoonSharp.Interpreter.Tree.Statements
 			bc.Emit_Ret(0);
 
 			meta.NumVal = bc.GetJumpPointForLastInstruction() - metaip;
+		}
+
+		public override void CompileIl(CompileOptions compileOptions)
+		{
+			m_Block.CompileIl(compileOptions);
 		}
 
 		public SymbolRef CreateUpvalue(BuildTimeScope scope, SymbolRef symbol)

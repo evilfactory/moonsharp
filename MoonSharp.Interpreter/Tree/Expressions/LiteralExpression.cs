@@ -1,4 +1,6 @@
-﻿using MoonSharp.Interpreter.Execution;
+﻿using System.Reflection.Emit;
+using MoonSharp.Interpreter.Execution;
+using MoonSharp.Interpreter.ILCompilation;
 
 namespace MoonSharp.Interpreter.Tree.Expressions
 {
@@ -55,6 +57,38 @@ namespace MoonSharp.Interpreter.Tree.Expressions
 		public override void Compile(Execution.VM.ByteCode bc)
 		{
 			bc.Emit_Literal(m_Value);
+		}
+
+		protected override ILType GetIlType()
+			=> m_Value.Type switch
+			{
+				DataType.Nil => ILType.Nil,
+				DataType.Number => ILType.Number,
+				DataType.Boolean => ILType.Boolean,
+				DataType.String => ILType.String,
+				// TODO
+				_ => throw new("AAAAA"),
+			};
+
+		public override void CompileIl(CompileOptions compileOptions) {
+			switch (m_Value.Type) {
+				case DataType.Nil:
+					compileOptions.Il.Emit(OpCodes.Ldnull);
+					break;
+				case DataType.Boolean:
+					compileOptions.Il.Emit(m_Value.Boolean ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
+					//il.Emit(OpCodes.Box, typeof(int));
+					break;
+				case DataType.Number:
+					compileOptions.Il.Emit(OpCodes.Ldc_R8, m_Value.Number);
+					//il.Emit(OpCodes.Box, typeof(double));
+					break;
+				case DataType.String:
+					compileOptions.Il.Emit(OpCodes.Ldstr, m_Value.String);
+					break;
+				default:
+					throw new InternalErrorException("type mismatch");
+			}
 		}
 
 		public override DynValue Eval(ScriptExecutionContext context)

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-
+using System.Reflection.Emit;
 using MoonSharp.Interpreter.Execution;
-
+using MoonSharp.Interpreter.ILCompilation;
 
 namespace MoonSharp.Interpreter.Tree.Statements
 {
@@ -38,6 +38,15 @@ namespace MoonSharp.Interpreter.Tree.Statements
 				foreach (Statement s in m_Statements)
 				{
 					s.Compile(bc);
+				}
+			}
+		}
+
+		public override void CompileIl(CompileOptions compileOptions)
+		{
+			if (m_Statements != null) {
+				foreach (var s in m_Statements) {
+					s.CompileIl(compileOptions);
 				}
 			}
 		}

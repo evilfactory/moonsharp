@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Reflection;
+using System.Reflection.Emit;
 using MoonSharp.Interpreter.Execution;
 using MoonSharp.Interpreter.Execution.VM;
+using MoonSharp.Interpreter.ILCompilation;
+using OpCode = MoonSharp.Interpreter.Execution.VM.OpCode;
 
 namespace MoonSharp.Interpreter.Tree.Expressions
 {
@@ -296,6 +300,8 @@ namespace MoonSharp.Interpreter.Tree.Expressions
 			}
 		}
 
+		private static readonly MethodInfo _concat = typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) });
+		private static readonly MethodInfo _pow = typeof(Math).GetMethod("Pow");
 
 		public override void Compile(Execution.VM.ByteCode bc)
 		{
@@ -327,6 +333,65 @@ namespace MoonSharp.Interpreter.Tree.Expressions
 
 			if (ShouldInvertBoolean(m_Operator))
 				bc.Emit_Operator(OpCode.Not);
+		}
+
+		protected override ILType GetIlType() =>
+			m_Operator switch
+			{
+				COMPARES or Operator.And or Operator.Or => ILType.Boolean,
+				Operator.StrConcat => ILType.String,
+				_ => ILType.Number,
+			};
+
+		public override void CompileIl(CompileOptions compileOptions)
+		{
+			// Since we can always determine our return type we don't need to box.
+			compileOptions = compileOptions with {Box = false};
+
+			if (m_Operator is Operator.GreaterOrEqual or Operator.LessOrEqual)
+				(m_Exp1, m_Exp2) = (m_Exp2, m_Exp1);
+
+			m_Exp1.CompileIl(compileOptions);
+			
+			// Shorthand
+			if (m_Operator is Operator.And or Operator.Or)
+			{
+				var skipSecondEval = compileOptions.Il.DefineLabel();
+				var end = compileOptions.Il.DefineLabel();
+				compileOptions.Il.Emit(m_Operator == Operator.Or ? OpCodes.Brfalse_S : OpCodes.Brtrue_S, skipSecondEval);
+				compileOptions.Il.Emit(OpCodes.Ldc_I4, m_Operator == Operator.Or ? 1 : 0);
+				compileOptions.Il.Emit(OpCodes.Br, end);
+				compileOptions.Il.MarkLabel(skipSecondEval);
+				m_Exp2.CompileIl(compileOptions);
+				compileOptions.Il.MarkLabel(end);
+				return;
+			}
+
+			m_Exp2.CompileIl(compileOptions);
+
+			if (m_Operator is Operator.Power or Operator.StrConcat) {
+				compileOptions.Il.Emit(OpCodes.Call, m_Operator == Operator.Power ? _pow : _concat);
+				return;
+			}
+
+			compileOptions.Il.Emit(m_Operator switch
+			{
+				Operator.Add => OpCodes.Add,
+				Operator.Div => OpCodes.Div,
+				Operator.Equal => OpCodes.Ceq,
+				Operator.Greater => OpCodes.Cgt,
+				Operator.GreaterOrEqual => OpCodes.Clt,
+				Operator.Less => OpCodes.Clt,
+				Operator.LessOrEqual => OpCodes.Cgt,
+				Operator.Mod => OpCodes.Rem,
+				Operator.Mul => OpCodes.Mul,
+				Operator.NotEqual => OpCodes.Ceq,
+				Operator.Sub => OpCodes.Sub,
+				_ => throw new("Invalid operator"),
+			});
+
+			if (m_Operator is Operator.NotEqual or Operator.GreaterOrEqual or Operator.LessOrEqual)
+				compileOptions.Il.Emit(OpCodes.Not);
 		}
 
 		public override DynValue Eval(ScriptExecutionContext context)
