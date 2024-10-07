@@ -237,7 +237,7 @@ namespace MoonSharp.Interpreter.Interop.BasicDescriptors
 			if (v == null && (Script.GlobalOptions.FuzzySymbolMatching & FuzzySymbolMatchingBehavior.Camelify) == FuzzySymbolMatchingBehavior.Camelify) v = TryIndex(script, obj, Camelify(index.String));
 			if (v == null && (Script.GlobalOptions.FuzzySymbolMatching & FuzzySymbolMatchingBehavior.PascalCase) == FuzzySymbolMatchingBehavior.PascalCase)	v = TryIndex(script, obj, UpperFirstLetter(Camelify(index.String)));
 
-			if (v == null && m_ExtMethodsVersion < UserData.GetExtensionMethodsChangeVersion())
+			if (v == null && m_ExtMethodsVersion <= UserData.GetExtensionMethodsChangeVersion())
 			{
 				m_ExtMethodsVersion = UserData.GetExtensionMethodsChangeVersion();
 
