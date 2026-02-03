@@ -1,4 +1,6 @@
 ﻿
+using System.Linq;
+
 namespace MoonSharp.Interpreter.Execution.VM
 {
 	sealed partial class Processor
@@ -63,6 +65,32 @@ namespace MoonSharp.Interpreter.Execution.VM
 
 		internal DynValue GetMetamethod(DynValue value, string metamethod)
 		{
+			if (value.Type == DataType.UserData && metamethod == "__call")
+			{
+				var ud = value.UserData;
+				var desc = ud.Descriptor;
+
+				if (desc != null)
+				{
+					var ctor = desc.Index(m_Script, ud.Object, DynValue.NewString("__new"), true);
+
+					if (ctor != null && !ctor.IsNil())
+					{
+						return DynValue.NewCallback((ctx, args) =>
+						{
+							var arr = args.GetArray();
+
+							if (arr.Length > 0)
+							{
+								arr = arr.Skip(1).ToArray();
+							}
+
+							return ctx.GetScript().Call(ctor, arr);
+						});
+					}
+				}
+			}
+
 			if (value.Type == DataType.UserData)
 			{
 				DynValue v = value.UserData.Descriptor.MetaIndex(m_Script, value.UserData.Object, metamethod);
