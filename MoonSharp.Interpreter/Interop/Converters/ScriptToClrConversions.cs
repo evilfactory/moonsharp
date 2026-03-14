@@ -1,8 +1,9 @@
-﻿using System;
+﻿using MoonSharp.Interpreter.Compatibility;
+using System;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
-using MoonSharp.Interpreter.Compatibility;
 
 namespace MoonSharp.Interpreter.Interop.Converters
 {
@@ -75,23 +76,38 @@ namespace MoonSharp.Interpreter.Interop.Converters
 			}
 		}
 
+		internal static ConcurrentDictionary<(Type BaseType, Type TargetType), MethodInfo> ImplicitConversionCache =
+			new ConcurrentDictionary<(Type BaseType, Type TargetType), MethodInfo>();
 		public static MethodInfo HasImplicitConversion(Type baseType, Type targetType)
 		{
+			if (ImplicitConversionCache.TryGetValue((baseType, targetType), out var method))
+			{
+				return method;
+			}
+
 			try
 			{
-				return Expression.Convert(Expression.Parameter(baseType, null), targetType).Method;
+				method = Expression.Convert(Expression.Parameter(baseType, null), targetType).Method;
+				ImplicitConversionCache.TryAdd((baseType, targetType), method);
+				return method;
 			}
 			catch
 			{
 				if (baseType.BaseType != null)
-                {
-					return HasImplicitConversion(baseType.BaseType, targetType);
+				{
+					method = HasImplicitConversion(baseType.BaseType, targetType);
+					ImplicitConversionCache.TryAdd((baseType, targetType), method);
+					return method;
 				}
 
 				if (targetType.BaseType != null)
 				{
-					return HasImplicitConversion(baseType, targetType.BaseType);
+					method = HasImplicitConversion(baseType, targetType.BaseType);
+					ImplicitConversionCache.TryAdd((baseType, targetType), method);
+					return method;
 				}
+
+				ImplicitConversionCache.TryAdd((baseType, targetType), null);
 
 				return null;
 			}
@@ -397,8 +413,9 @@ namespace MoonSharp.Interpreter.Interop.Converters
 				return WEIGHT_NUMBER_DOWNCAST;
 		}
 
-
-
-
+		public static void ClearCache()
+		{
+			ImplicitConversionCache.Clear();
+		}
 	}
 }
