@@ -250,15 +250,18 @@ namespace MoonSharp.Interpreter.Interop
 
 			outParams = null;
 
-			for (int i = 0; i < args.Count; i++)
+			for (int i = 0; i < parameters.Length; i++)
 			{
 				// keep track of out and ref params
 				if (parameters[i].Type.IsByRef)
 				{
 					if (outParams == null) outParams = new List<int>();
-					outParams.Add(i);
+					outParams.Add(i - MethodInfo.GetGenericArguments().Length);
 				}
+			}
 
+			for (int i = 0; i < args.Count; i++)
+			{
 				// if an ext method, we have an obj -> fill the first param
 				if (ExtensionMethodType != null && obj != null && i == 0)
 				{
