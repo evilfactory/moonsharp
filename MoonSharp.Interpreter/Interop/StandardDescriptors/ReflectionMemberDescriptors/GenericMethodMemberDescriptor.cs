@@ -225,6 +225,10 @@ namespace MoonSharp.Interpreter.Interop
 			MethodInfo genericMethod = ((MethodInfo)MethodInfo).MakeGenericMethod(generics);
 			retv = genericMethod.Invoke(obj, parameters);
 
+			for (int i = 0; i < parameters.Length; i++)
+			{
+				pars[i + amountGenerics] = parameters[i];
+			}
 
 			return BuildReturnValue(script, outParams, pars, retv);
 		}
@@ -256,7 +260,7 @@ namespace MoonSharp.Interpreter.Interop
 				if (parameters[i].Type.IsByRef)
 				{
 					if (outParams == null) outParams = new List<int>();
-					outParams.Add(i - MethodInfo.GetGenericArguments().Length);
+					outParams.Add(i);
 				}
 			}
 
